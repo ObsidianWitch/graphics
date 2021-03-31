@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Dimetric grid generator
+# screenshot: https://i.imgur.com/HxSRk4C.png
 # dep: [Pillow](https://pypi.org/project/Pillow/)
 
 import collections
