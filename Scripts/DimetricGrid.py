@@ -4,43 +4,51 @@
 # screenshot: https://i.imgur.com/HxSRk4C.png
 # dep: [Pillow](https://pypi.org/project/Pillow/)
 
+import typing as t
 import collections
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw # type: ignore
 from pathlib import Path
+from dataclasses import dataclass
+
+@dataclass
+class Segment:
+    width:int; height:int; n:int
 
 class Edge:
-    def __init__(self, segwidth, segheight, segn):
-        self.segwidth = segwidth
-        self.segheight = segheight
-        self.segn = segn
+    def __init__(self, seg:Segment):
+        """An edge is one side of a rhombus. It is composed of n segments. Each
+        segment is a rectangle of width*height pixels."""
+        self.seg = seg
 
     def width(self):
-        return self.segn * self.segwidth
+        return self.seg.n * self.seg.width
 
     def height(self):
-        return self.segn * self.segheight
+        return self.seg.n * self.seg.height
 
     def size(self):
         return (self.width(), self.height())
 
-    def image(self, fgcolor, bgcolor):
+    def image(self, fgcolor:str, bgcolor:str):
         img = Image.new('RGBA', self.size(), bgcolor)
         drawtool = ImageDraw.Draw(img)
 
-        for i in range(self.segn):
-            x = self.width() - (i + 1) * self.segwidth
-            y = self.segheight * i
+        for i in range(self.seg.n):
+            x = self.width() - (i + 1) * self.seg.width
+            y = self.seg.height * i
             p1 = (x, y)
-            p2 = (x + self.segwidth - 1, y + self.segheight - 1)
+            p2 = (x + self.seg.width - 1, y + self.seg.height - 1)
             drawtool.rectangle((p1, p2), fgcolor)
 
         return img
 
     def __str__(self):
-        return f"e{self.segwidth}x{self.segheight}x{self.segn}"
+        return f"e{self.seg.width}x{self.seg.height}x{self.seg.n}"
 
 class Tile:
-    def __init__(self, edge):
+    def __init__(self, edge:Edge):
+        """A Tile is composed of an edge mirrored vertically and horizontally to
+        form a rhombus."""
         self.edge = edge
 
     def width(self):
@@ -52,7 +60,7 @@ class Tile:
     def size(self):
         return [self.width(), self.height()]
 
-    def image(self, fgcolor, bgcolor):
+    def image(self, fgcolor:str, bgcolor:str):
         img = Image.new('RGBA', self.size())
         img.paste(self.edge.image(fgcolor, bgcolor), (0, 0))
         img.alpha_composite(img.transpose(Image.FLIP_LEFT_RIGHT))
@@ -63,7 +71,8 @@ class Tile:
         return f"t{self.width()}x{self.height()}_{self.edge}"
 
 class Grid:
-    def __init__(self, tile, n):
+    def __init__(self, tile:Tile, n:t.Tuple[int, int]):
+        """A Grid is composed of n*n tiles."""
         self.tile = tile
         self.n = n
 
@@ -76,7 +85,7 @@ class Grid:
     def size(self):
         return [self.width(), self.height()]
 
-    def image(self, fgcolor, bgcolor):
+    def image(self, fgcolor:str, bgcolor:str):
         tileimg = self.tile.image(fgcolor, bgcolor)
         gridimg = Image.new('RGBA', self.size())
         for x in range(0, self.width(), self.tile.width()):
@@ -95,7 +104,7 @@ def save(element):
 
 if __name__ == "__main__":
     grid = Grid(
-        tile = Tile(Edge(segwidth=4, segheight=2, segn=8)),
+        tile = Tile(Edge(Segment(width=4, height=2, n=8))),
         n = (10, 10)
     )
     save(grid)
