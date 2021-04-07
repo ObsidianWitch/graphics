@@ -5,8 +5,9 @@
 import bpy
 
 bpy.context.preferences.view.show_splash = False
-bpy.ops.object.select_all(action='SELECT')
-bpy.ops.object.delete()
+for data_type in (bpy.data.actions, bpy.data.cameras, bpy.data.lights,
+                  bpy.data.meshes, bpy.data.objects, bpy.data.collections):
+    for item in data_type: data_type.remove(item)
 
 # 10*10 cubes grid
 bpy.ops.mesh.primitive_cube_add(size=2)
@@ -15,4 +16,3 @@ for _ in range(9):
 bpy.ops.object.select_all(action='SELECT')
 for _ in range(9):
     bpy.ops.object.duplicate_move(TRANSFORM_OT_translate={"value":(2, 0, 0)})
-
