@@ -15,6 +15,8 @@ for data_type in (bpy.data.actions, bpy.data.cameras, bpy.data.lights,
 # 10*10 cubes grid
 bpy.ops.mesh.primitive_cube_add()
 cubetpl = bpy.context.active_object
+cubetpl.modifiers.new(name='Wireframe', type='WIREFRAME')
+cubetpl.modifiers['Wireframe'].thickness = 0.05
 for x, y in itertools.product(range(10), repeat=2):
     if x == 0 and y == 0: continue
     c = cubetpl.copy()
