@@ -31,24 +31,26 @@ nodes = material.node_tree.nodes
 nodes.remove(nodes['Principled BSDF'])
 nodes.new('ShaderNodeTexCoord')
 nodes.new('ShaderNodeEmission')
+nodes['Emission'].inputs['Strength'].default_value = 0.5
 
 ### links between nodes
 links = material.node_tree.links
-links.new(nodes['Texture Coordinate'].outputs['Window'],
+links.new(nodes['Texture Coordinate'].outputs['Camera'],
           nodes['Emission'].inputs['Color'])
 links.new(nodes['Emission'].outputs['Emission'],
           nodes['Material Output'].inputs['Surface'])
 
 # 10*10 cubes grid
+scene = bpy.data.scenes['Scene']
 for x, y in itertools.product(range(10), repeat=2):
     if x == 0 and y == 0: continue
     c = cubetpl.copy()
     c.location[0] = x * 2
     c.location[1] = y * 2
-    bpy.data.scenes['Scene'].collection.objects.link(c)
+    scene.collection.objects.link(c)
 
 # animation
-bpy.data.scenes['Scene'].frame_end = 80 + len(bpy.data.objects)
+scene.frame_end = 80 + len(bpy.data.objects)
 for i, obj in enumerate(bpy.data.objects):
     obj.scale = (0, 0, 0)
     obj.keyframe_insert(data_path='scale', frame=1 + i)
@@ -58,3 +60,9 @@ for i, obj in enumerate(bpy.data.objects):
     obj.keyframe_insert(data_path='scale', frame=70 + i)
     obj.scale = (1, 1, 1)
     obj.keyframe_insert(data_path='scale', frame=80 + i)
+
+# world & render
+bpy.data.worlds['World'] \
+   .node_tree.nodes["Background"] \
+   .inputs['Color'].default_value = (0, 0, 0, 1)
+scene.eevee.use_bloom = True
