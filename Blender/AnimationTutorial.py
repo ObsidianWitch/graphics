@@ -5,7 +5,7 @@
 # ref: [Python Performance with Blender operators](https://blender.stackexchange.com/a/7360)
 # blender version: 2.92.0
 
-import bpy, itertools
+import bpy, itertools, math, mathutils
 
 bpy.context.preferences.view.show_splash = False
 for data_type in (bpy.data.actions, bpy.data.cameras, bpy.data.lights,
@@ -31,7 +31,7 @@ nodes = material.node_tree.nodes
 nodes.remove(nodes['Principled BSDF'])
 nodes.new('ShaderNodeTexCoord')
 nodes.new('ShaderNodeEmission')
-nodes['Emission'].inputs['Strength'].default_value = 0.5
+nodes['Emission'].inputs['Strength'].default_value = 2.5
 
 ### links between nodes
 links = material.node_tree.links
@@ -60,6 +60,13 @@ for i, obj in enumerate(bpy.data.objects):
     obj.keyframe_insert(data_path='scale', frame=70 + i)
     obj.scale = (1, 1, 1)
     obj.keyframe_insert(data_path='scale', frame=80 + i)
+
+# camera
+bpy.ops.object.camera_add()
+camera = bpy.data.objects['Camera']
+camera.location = mathutils.Vector((-10, -10, 30))
+camera.rotation_euler[0] = math.radians(45)
+camera.rotation_euler[2] = math.radians(-45)
 
 # world & render
 bpy.data.worlds['World'] \
