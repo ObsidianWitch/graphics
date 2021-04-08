@@ -9,14 +9,37 @@ import bpy, itertools
 
 bpy.context.preferences.view.show_splash = False
 for data_type in (bpy.data.actions, bpy.data.cameras, bpy.data.lights,
-                  bpy.data.meshes, bpy.data.objects, bpy.data.collections):
+                  bpy.data.materials, bpy.data.meshes, bpy.data.objects,
+                  bpy.data.collections):
     for item in data_type: data_type.remove(item)
 
-# 10*10 cubes grid
+# template cube
 bpy.ops.mesh.primitive_cube_add()
 cubetpl = bpy.context.active_object
+
+## modifiers
 cubetpl.modifiers.new(name='Wireframe', type='WIREFRAME')
 cubetpl.modifiers['Wireframe'].thickness = 0.05
+
+## materials
+material = bpy.data.materials.new(name='Material')
+material.use_nodes = True
+cubetpl.data.materials.append(material)
+
+### shader nodes (tip: organize nodes in GUI w/ 'Node Arrange' addon)
+nodes = material.node_tree.nodes
+nodes.remove(nodes['Principled BSDF'])
+nodes.new('ShaderNodeTexCoord')
+nodes.new('ShaderNodeEmission')
+
+### links between nodes
+links = material.node_tree.links
+links.new(nodes['Texture Coordinate'].outputs['Window'],
+          nodes['Emission'].inputs['Color'])
+links.new(nodes['Emission'].outputs['Emission'],
+          nodes['Material Output'].inputs['Surface'])
+
+# 10*10 cubes grid
 for x, y in itertools.product(range(10), repeat=2):
     if x == 0 and y == 0: continue
     c = cubetpl.copy()
