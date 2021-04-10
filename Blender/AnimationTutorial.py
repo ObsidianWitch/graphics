@@ -5,26 +5,37 @@
 # ref: [Python Performance with Blender operators](https://blender.stackexchange.com/a/7360)
 # blender version: 2.92.0
 
-import bpy, itertools, math, mathutils
+import bpy, bmesh, itertools, math, mathutils
 
+def template_cube():
+
+
+    return obj
+
+# reset
 bpy.context.preferences.view.show_splash = False
 for data_type in (bpy.data.actions, bpy.data.cameras, bpy.data.lights,
                   bpy.data.materials, bpy.data.meshes, bpy.data.objects,
                   bpy.data.collections):
-    for item in data_type: data_type.remove(item)
+    for item in data_type:
+        data_type.remove(item)
 
-# template cube
-bpy.ops.mesh.primitive_cube_add()
-cubetpl = bpy.context.active_object
+# template cube (equivalent: bpy.ops.mesh.primitive_cube_add())
+bm = bmesh.new()
+bmesh.ops.create_cube(bm, size=2.0)
+mesh = bpy.data.meshes.new('Cube')
+bm.to_mesh(mesh)
+bm.free()
+tplcube = bpy.data.objects.new('Cube', mesh)
 
 ## modifiers
-cubetpl.modifiers.new(name='Wireframe', type='WIREFRAME')
-cubetpl.modifiers['Wireframe'].thickness = 0.05
+tplcube.modifiers.new(name='Wireframe', type='WIREFRAME')
+tplcube.modifiers['Wireframe'].thickness = 0.05
 
 ## materials
 material = bpy.data.materials.new(name='Material')
 material.use_nodes = True
-cubetpl.data.materials.append(material)
+tplcube.data.materials.append(material)
 
 ### shader nodes (tip: organize nodes in GUI w/ 'Node Arrange' addon)
 nodes = material.node_tree.nodes
@@ -44,7 +55,7 @@ links.new(nodes['Emission'].outputs['Emission'],
 scene = bpy.data.scenes['Scene']
 for x, y in itertools.product(range(10), repeat=2):
     if x == 0 and y == 0: continue
-    c = cubetpl.copy()
+    c = tplcube.copy()
     c.location[0] = x * 2
     c.location[1] = y * 2
     scene.collection.objects.link(c)
