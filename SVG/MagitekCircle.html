@@ -1,0 +1,169 @@
+<!--
+Author: Obsidienne - https://obsidienne.gitlab.io/
+Inspiration: Magical Girl Lyrical Nanoha magic circle
+References:
+    * MDN SVG: https://developer.mozilla.org/en-US/docs/Web/SVG
+    * CSS clip-path maker: https://bennettfeely.com/clippy/
+    * SVG Path Builder: https://codepen.io/anthonydugois/full/mewdyZ
+    * SvgPathEditor: https://yqnn.github.io/svg-path-editor/
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <style>
+        :root {
+            --purple: hsl(288, 60%, 67%);
+            background: hsl(220, 15%, 20%);
+        }
+        * { transform-origin: 50% 50%; }
+
+        .cmd {
+            font-family: monospace;
+            font-variant: small-caps;
+            font-size: 14pt;
+            fill: var(--purple);
+        }
+        #cmd1 {
+            animation:
+                opacity 2s linear 0s both,
+                spincmd1 10s linear 0s infinite;
+        }
+        #cmd2 {
+            animation:
+                opacity 2s linear 0s both,
+                spincmd2 10s linear 0s infinite reverse;
+        }
+
+        .circle {
+            fill: none;
+            stroke: var(--purple);
+            stroke-width: 2;
+            filter: drop-shadow(0 0 3px var(--purple));
+        }
+        #circle10 {
+            transform: scale(1.10);
+            stroke-width: 4;
+        }
+        #circle11 { transform: scale(1.05); }
+        #circle12 { transform: scale(0.90); }
+        #circle20 { transform: scale(0.75); }
+        #circle21 { transform: scale(0.625); }
+        #circle22 {
+            transform: scale(0.625);
+            fill: url("#hexpattern");
+
+            animation:
+                opacity 2s linear 0s both;
+        }
+
+        .hex {
+            fill: none;
+            stroke: white;
+            filter: drop-shadow(0 0 3px white);
+        }
+        #hex1 {
+            animation:
+                strokecw 2s linear 0s both,
+                spin 4s linear 0s infinite;
+        }
+        #hex2 {
+            animation:
+                strokeccw 2s linear 0s both,
+                spin 4s linear 0s infinite reverse;
+        }
+        #hexpattern {
+            fill: none;
+            stroke: white;
+        }
+
+        @keyframes opacity {
+            from { opacity: 0.0; }
+            to { opacity: 1.0; }
+        }
+        @keyframes strokecw {
+            from {
+                stroke-dasharray: 200%;
+                stroke-dashoffset: 200%;
+            }
+            to {
+                stroke-dasharray: 200%;
+                stroke-dashoffset: 0%;
+            }
+        }
+        @keyframes strokeccw {
+            from {
+                stroke-dasharray: 200%;
+                stroke-dashoffset: -200%;
+            }
+            to {
+                stroke-dasharray: 200%;
+                stroke-dashoffset: 0%;
+            }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+        @keyframes spincmd1 {
+            from { transform: scale(0.95) rotate(0deg); }
+            to   { transform: scale(0.95) rotate(360deg); }
+        }
+        @keyframes spincmd2 {
+            from { transform: scale(0.66) rotate(0deg); }
+            to   { transform: scale(0.66) rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
+        <defs>
+            <circle id="cdef" cx="300" cy="300" r="200"/>
+            <path id="hexp1" d="M 300 480 L 150 400 L 150 300 L 150 200 L 300 120
+                L 450 200 L 450 300 L 450 400 Z"/>
+            <path id="hexp2" d="M 16 0 L 32 8 L 32 24 L 16 32 L 0 24 L 0 8 Z"/>
+            <pattern id="hexpattern" patternUnits="userSpaceOnUse" width="36" height="56">
+                <use href="#hexp2" x="+2"  y="-16"/>
+                <use href="#hexp2" x="+2"  y="+40"/>
+                <use href="#hexp2" x="-16" y="+12"/>
+                <use href="#hexp2" x="+20" y="+12"/>
+            </pattern>
+        </defs>
+
+        <use id="hex1" class="hex" href="#hexp1"/>
+        <use id="hex2" class="hex" href="#hexp1"/>
+        <use id="circle10" class="circle" href="#cdef"/>
+        <use id="circle11" class="circle" href="#cdef"/>
+        <use id="circle12" class="circle" href="#cdef"/>
+        <use id="circle20" class="circle" href="#cdef"/>
+        <use id="circle21" class="circle" href="#cdef"/>
+        <use id="circle22" href="#cdef"/>
+        <text id="cmd1" class="cmd" textLength="210%">
+            <textPath href="#cdef">placeholder</textPath>
+        </text>
+        <text id="cmd2" class="cmd" textLength="210%">
+            <textPath href="#cdef">placeholder</textPath>
+        </text>
+    </svg>
+
+    <script>
+        let select = selectors => document.querySelector(selectors)
+        select('#cmd1 textPath').textContent = select('script').textContent
+
+        let randi = length => Math.floor(Math.random() * length)
+        let choice = array => array[randi(array.length)]
+
+        let symbols = "▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▕▖▗▘▙▚▛▜▝▞▟▀▔ "
+        let array = Array.from({length:130}, () => choice(symbols))
+        let i = 0
+        setInterval(() => {
+            for (let j = 0; j < 10; j++) {
+                array[randi(array.length)] = choice(symbols)
+            }
+            select('#cmd2 textPath').textContent = array.join('')
+            i = (i + 1) % array.length
+        }, 100)
+    </script>
+</body>
+</html>
