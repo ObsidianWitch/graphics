@@ -1,19 +1,16 @@
 #!/usr/bin/env -S blender --factory-startup --python
 
+# name: Animated grid of cubes
+# blender: 2.92.0
 # ref: [CG Cookie - Animating With Python](https://www.youtube.com/watch?v=QnvN1dieIAU)
 # ref: [BPY Documentation](https://docs.blender.org/api/current/)
 # ref: [Python Performance with Blender operators](https://blender.stackexchange.com/a/7360)
-# blender version: 2.92.0
 
-import bpy, bmesh, itertools, math, mathutils
-
-def reset():
-    bpy.context.preferences.view.show_splash = False
-    for data_type in (bpy.data.actions, bpy.data.cameras, bpy.data.lights,
-                      bpy.data.materials, bpy.data.meshes, bpy.data.objects,
-                      bpy.data.collections):
-        for item in data_type:
-            data_type.remove(item)
+import sys, itertools, math
+import bpy, bmesh, mathutils
+if "." not in sys.path: sys.path.append(".")
+import Shared.preamble
+Shared.preamble.reset()
 
 # Create a template cube.
 def new_cube():
@@ -92,8 +89,6 @@ def setup_scene(collection):
     scene.frame_end = 80 + len(collection.objects)
     scene.eevee.use_bloom = True
 
-if __name__ == "__main__":
-    reset()
-    cube = new_cube()
-    grid = new_grid(obj=cube)
-    setup_scene(collection=grid)
+cube = new_cube()
+grid = new_grid(obj=cube)
+setup_scene(collection=grid)
