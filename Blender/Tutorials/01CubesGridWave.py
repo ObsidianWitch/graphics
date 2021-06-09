@@ -9,16 +9,12 @@
 import sys, itertools, math
 import bpy, bmesh, mathutils
 if "." not in sys.path: sys.path.append(".")
+import Shared.mesh
 
 # Create a template cube.
 def new_cube():
     # mesh & object (alt: bpy.ops.mesh.primitive_cube_add())
-    bm = bmesh.new()
-    bmesh.ops.create_cube(bm, size=2.0)
-    mesh = bpy.data.meshes.new('Cube')
-    bm.to_mesh(mesh)
-    bm.free()
-    obj = bpy.data.objects.new('Cube', mesh)
+    obj = Shared.mesh.new_cube()
 
     # modifiers
     obj.modifiers.new(name='Wireframe', type='WIREFRAME')
