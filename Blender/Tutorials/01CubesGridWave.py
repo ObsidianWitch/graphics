@@ -9,8 +9,6 @@
 import sys, itertools, math
 import bpy, bmesh, mathutils
 if "." not in sys.path: sys.path.append(".")
-import Shared.preamble
-Shared.preamble.reset()
 
 # Create a template cube.
 def new_cube():
@@ -89,6 +87,7 @@ def setup_scene(collection):
     scene.frame_end = 80 + len(collection.objects)
     scene.eevee.use_bloom = True
 
-cube = new_cube()
-grid = new_grid(obj=cube)
-setup_scene(collection=grid)
+if __name__ == '__main__':
+    cube = new_cube()
+    grid = new_grid(obj=cube)
+    setup_scene(collection=grid)
