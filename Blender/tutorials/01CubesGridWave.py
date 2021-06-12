@@ -9,12 +9,13 @@
 import sys, itertools, math
 import bpy, bmesh, mathutils
 if "." not in sys.path: sys.path.append(".")
-import Shared.mesh
+import addons.script_reset
+import shared.mesh
 
 # Create a template cube.
 def new_cube():
     # mesh & object (alt: bpy.ops.mesh.primitive_cube_add())
-    obj = Shared.mesh.new_cube()
+    obj = shared.mesh.new_cube()
 
     # modifiers
     obj.modifiers.new(name='Wireframe', type='WIREFRAME')
@@ -84,6 +85,7 @@ def setup_scene(collection):
     scene.eevee.use_bloom = True
 
 if __name__ == '__main__':
+    addons.script_reset.delete_data()
     cube = new_cube()
     grid = new_grid(obj=cube)
     setup_scene(collection=grid)
