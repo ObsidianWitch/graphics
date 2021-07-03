@@ -1,13 +1,13 @@
 import bpy, bmesh
 
-def bmesh2obj(bm, name):
-    mesh = bpy.data.meshes.new(name)
-    bm.to_mesh(mesh)
-    return bpy.data.objects.new(name, mesh)
-
-def new_cube(*args, **kwargs):
+def new_cube(*args, name='Cube', **kwargs):
     bm = bmesh.new()
     bmesh.ops.create_cube(bm, *args, **kwargs)
-    obj = bmesh2obj(bm, name='Cube')
+    mesh = bpy.data.meshes.new(name)
+    bm.to_mesh(mesh)
     bm.free()
-    return obj
+    return bpy.data.objects.new(name, mesh)
+
+def shade(mesh, smooth):
+    for p in mesh.polygons:
+        p.use_smooth = smooth
