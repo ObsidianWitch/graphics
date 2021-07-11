@@ -26,7 +26,7 @@ class Owl:
     @classmethod
     def new_torso(cls):
         # mesh & object
-        obj = shared.mesh.new_cube(name='Cube', size=2)
+        obj = shared.mesh.new_cube(name='Torso', size=2)
         shared.mesh.shade(obj.data, smooth=True)
 
         # modifiers
