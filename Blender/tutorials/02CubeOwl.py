@@ -19,6 +19,7 @@ class Owl:
         collection.objects.link(torso)
 
         wings = cls.new_wings(anchor=torso)
+        wings.parent = torso
         collection.objects.link(wings)
 
         return collection
