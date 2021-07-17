@@ -22,6 +22,9 @@ class Owl:
         wings.parent = torso
         collection.objects.link(wings)
 
+        feather = cls.new_feather()
+        collection.objects.link(feather)
+
         return collection
 
     @classmethod
@@ -68,6 +71,33 @@ class Owl:
         mirror2_mod = obj.modifiers.new(name='MirrorObject', type='MIRROR')
         mirror2_mod.mirror_object = anchor
         bevel_mod = obj.modifiers.new(name='Bevel', type='BEVEL')
+
+        return obj
+
+    @classmethod
+    def new_feather(cls):
+        # meshes
+        meshes = [ bpy.data.meshes.new('Feather') ]
+        meshes[0].from_pydata(
+            vertices = ((-0.27, 0.31, 0.0), (0.0, -0.88, 0.0),
+                        (-0.27, 0.51, 0.0), (0.0, 0.90, 0.0),
+                        (0.0, 0.40, 0.10), (-0.10, 0.90, 0.0),
+                        (-0.05, -0.88, 0.0)),
+            edges = (),
+            faces = ((3, 5, 4), (5, 2, 4), (0, 4, 2), (1, 4, 0, 6)),
+        )
+        shared.mesh.shade(meshes[0], smooth=True)
+
+        # object
+        obj = bpy.data.objects.new('Feather', meshes[0])
+
+        # modifier
+        mirrorx_mod = obj.modifiers.new(name='MirrorX', type='MIRROR')
+        mirrorx_mod.use_clip = True
+        subdiv_mod = obj.modifiers.new(name='Subdivision', type='SUBSURF')
+        subdiv_mod.levels = subdiv_mod.render_levels = 2
+        mirrorz_mod = obj.modifiers.new(name='MirrorZ', type='MIRROR')
+        mirrorz_mod.use_axis = (False, False, True)
 
         return obj
 
