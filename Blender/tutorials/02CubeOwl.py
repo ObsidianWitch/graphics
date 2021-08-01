@@ -6,6 +6,7 @@
 
 import sys
 import bpy, bmesh
+from mathutils import Matrix, Vector
 if "." not in sys.path: sys.path.append(".")
 import addons.script_reset
 import shared.mesh
@@ -76,9 +77,9 @@ class Owl:
 
     @classmethod
     def new_feather(cls):
-        # meshes
-        meshes = [ bpy.data.meshes.new('Feather') ]
-        meshes[0].from_pydata(
+        # mesh
+        mesh = bpy.data.meshes.new('Feather')
+        mesh.from_pydata(
             vertices = ((-0.27, 0.31, 0.0), (0.0, -0.88, 0.0),
                         (-0.27, 0.51, 0.0), (0.0, 0.90, 0.0),
                         (0.0, 0.40, 0.10), (-0.10, 0.90, 0.0),
@@ -86,12 +87,12 @@ class Owl:
             edges = (),
             faces = ((3, 5, 4), (5, 2, 4), (0, 4, 2), (1, 4, 0, 6)),
         )
-        shared.mesh.shade(meshes[0], smooth=True)
+        shared.mesh.shade(mesh, smooth=True)
 
         # object
-        obj = bpy.data.objects.new('Feather', meshes[0])
+        obj = bpy.data.objects.new('Feather', mesh)
 
-        # modifier
+        # modifiers
         mirrorx_mod = obj.modifiers.new(name='MirrorX', type='MIRROR')
         mirrorx_mod.use_clip = True
         subdiv_mod = obj.modifiers.new(name='Subdivision', type='SUBSURF')
@@ -99,7 +100,16 @@ class Owl:
         mirrorz_mod = obj.modifiers.new(name='MirrorZ', type='MIRROR')
         mirrorz_mod.use_axis = (False, False, True)
 
+        # origin
+        set_origin(obj, (0.0, -0.88, 0.0))
+
         return obj
+
+# ref: https://blender.stackexchange.com/a/35830
+def set_origin(object, point):
+    point = Vector(point)
+    object.data.transform(Matrix.Translation(-point))
+    object.matrix_world.translation += point
 
 if __name__ == '__main__':
     # reset data
