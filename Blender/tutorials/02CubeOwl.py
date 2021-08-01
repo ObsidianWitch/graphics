@@ -23,11 +23,10 @@ class Owl:
         wings.parent = torso
         collection.objects.link(wings)
 
-        feather = cls.new_feather()
-        feather.location = (0.0, 0.9, -0.6)
-        feather.rotation_euler.x = math.radians(25)
-        feather.parent = torso
-        collection.objects.link(feather)
+        feathers = cls.new_feathers(location=(0.0, 0.9, -0.6))
+        for feather in feathers:
+            feather.parent = torso
+            collection.objects.link(feather)
 
         return collection
 
@@ -79,17 +78,33 @@ class Owl:
         return obj
 
     @classmethod
+    def new_feathers(cls, location):
+        feathers = [ cls.new_feather() ]
+        feathers[0].location = location
+        feathers += [feathers[0].copy() for _ in range(4)]
+
+        for feather, angle, scale in zip(
+            feathers, range(-50, 75, 25), [0.6, 0.8, 1.0, 0.8, 0.6]
+        ):
+            feather.scale = (scale, scale, scale)
+            feather.rotation_euler.z = math.radians(angle)
+            # ref: https://blender.stackexchange.com/q/44760
+            feather.rotation_euler = (
+                Matrix.Rotation(math.radians(25), 3, 'X')
+                @ feather.rotation_euler.to_matrix()
+            ).to_euler()
+        return feathers
+
+    @classmethod
     def new_feather(cls):
         # mesh
+        vertices = ((-0.27, 0.31, 0.0), (0.0, -0.88, 0.0),
+                    (-0.27, 0.51, 0.0), (0.0, 0.90, 0.0),
+                    (0.0, 0.40, 0.10), (-0.10, 0.90, 0.0),
+                    (-0.05, -0.88, 0.0))
+        faces = ((3, 5, 4), (5, 2, 4), (0, 4, 2), (1, 4, 0, 6))
         mesh = bpy.data.meshes.new('Feather')
-        mesh.from_pydata(
-            vertices = ((-0.27, 0.31, 0.0), (0.0, -0.88, 0.0),
-                        (-0.27, 0.51, 0.0), (0.0, 0.90, 0.0),
-                        (0.0, 0.40, 0.10), (-0.10, 0.90, 0.0),
-                        (-0.05, -0.88, 0.0)),
-            edges = (),
-            faces = ((3, 5, 4), (5, 2, 4), (0, 4, 2), (1, 4, 0, 6)),
-        )
+        mesh.from_pydata(vertices=vertices, edges=(), faces=faces)
         shared.mesh.shade(mesh, smooth=True)
 
         # object
@@ -104,7 +119,7 @@ class Owl:
         mirrorz_mod.use_axis = (False, False, True)
 
         # origin
-        set_origin(obj, (0.0, -0.88, 0.0))
+        set_origin(obj, vertices[1])
 
         return obj
 
