@@ -4,7 +4,7 @@
 # blender: 2.93.0
 # ref: https://cloud.blender.org/training/primitive-animals/
 
-import sys
+import sys, math
 import bpy, bmesh
 from mathutils import Matrix, Vector
 if "." not in sys.path: sys.path.append(".")
@@ -24,6 +24,9 @@ class Owl:
         collection.objects.link(wings)
 
         feather = cls.new_feather()
+        feather.location = (0.0, 0.9, -0.6)
+        feather.rotation_euler.x = math.radians(25)
+        feather.parent = torso
         collection.objects.link(feather)
 
         return collection
