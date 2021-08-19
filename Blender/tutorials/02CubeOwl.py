@@ -19,6 +19,10 @@ class Owl:
         torso = cls.new_torso()
         collection.objects.link(torso)
 
+        face = cls.new_face()
+        face.parent = torso
+        collection.objects.link(face)
+
         wings = cls.new_wings(anchor=torso)
         wings.parent = torso
         collection.objects.link(wings)
@@ -42,6 +46,39 @@ class Owl:
         bevel_mod.segments = 2
 
         return obj
+
+    @classmethod
+    def new_face(cls):
+        # mesh: half-heart face
+        mesh = bpy.data.meshes.new('Face')
+        mesh.from_pydata(
+            # The vertices 1 and 5 control/guide the subdivision modifier.
+            vertices=((0.0, 0.0, -0.72), (-0.045, 0, -0.702),
+                      (-0.9, 0.0, -0.36), (-0.9, 0.0, 0.45),
+                      (-0.45, 0.0, 0.9), (-0.040725, 0.0, 0.490725),
+                      (0.0, 0.0, 0.45), (0.0, 0.0, -0.36)),
+            edges=(),
+            faces=((0, 1, 2, 7), (7, 2, 3, 6), (6, 3, 4, 5)),
+        )
+        shared.mesh.shade(mesh, smooth=True)
+
+        # bmesh: extrude
+        bm = bmesh.new()
+        bm.from_mesh(mesh)
+        _geom = bmesh.ops.extrude_face_region(bm, geom=bm.faces)
+        bmesh.ops.translate(bm, vec=(0.0, -0.1, 0.0), verts=bm.verts[8:])
+        bm.to_mesh(mesh)
+        bm.free()
+
+        # object
+        obj = bpy.data.objects.new('Face', mesh)
+        obj.location.y = -0.95
+        mirror_mod = obj.modifiers.new(name='Mirror', type='MIRROR')
+        subdiv_mod = obj.modifiers.new(name='Subdivision', type='SUBSURF')
+        subdiv_mod.levels = subdiv_mod.render_levels = 2
+
+        return obj
+
 
     @classmethod
     def new_wings(cls, anchor):
