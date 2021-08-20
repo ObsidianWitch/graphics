@@ -62,11 +62,22 @@ class Owl:
         )
         shared.mesh.shade(mesh, smooth=True)
 
-        # bmesh: extrude
+        # bmesh
         bm = bmesh.new()
         bm.from_mesh(mesh)
+
+        # extrude
         _geom = bmesh.ops.extrude_face_region(bm, geom=bm.faces)
+        bm.verts.ensure_lookup_table()
         bmesh.ops.translate(bm, vec=(0.0, -0.1, 0.0), verts=bm.verts[8:])
+
+        # remove 2 inside faces to avoid central crease in mirrored object
+        inner_edge = next(
+            edge for edge in bm.edges
+            if (bm.verts[7] in edge.verts) and (bm.verts[11] in edge.verts)
+        )
+        bm.edges.remove(inner_edge)
+
         bm.to_mesh(mesh)
         bm.free()
 
