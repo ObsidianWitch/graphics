@@ -7,6 +7,7 @@
 import sys, math
 import bpy, bmesh
 from mathutils import Matrix, Vector
+import numpy as np
 if "." not in sys.path: sys.path.append(".")
 import addons.script_reset
 import shared.mesh
@@ -19,9 +20,10 @@ class Owl:
         torso = cls.new_torso()
         collection.objects.link(torso)
 
-        face = cls.new_face()
-        face.parent = torso
-        collection.objects.link(face)
+        face_parts = cls.new_face()
+        face_parts[0].parent = torso
+        for part in face_parts:
+            collection.objects.link(part)
 
         wings = cls.new_wings(anchor=torso)
         wings.parent = torso
@@ -49,6 +51,14 @@ class Owl:
 
     @classmethod
     def new_face(cls):
+        base = cls.new_face_base()
+        beak = cls.new_face_beak()
+        beak.parent = base
+        return [base, beak]
+
+
+    @classmethod
+    def new_face_base(cls):
         # mesh: half-heart face
         mesh = bpy.data.meshes.new('Face')
         mesh.from_pydata(
@@ -88,6 +98,46 @@ class Owl:
 
         return obj
 
+    @classmethod
+    def new_face_beak(cls):
+        def cartesian_circle(radius, angles):
+            return tuple(zip(
+                [0] * len(angles),
+                radius * np.cos(angles),
+                radius * np.sin(angles),
+            ))
+
+        def cartesian_log_spiral(a, k, angles):
+            radius = a * np.exp(k * angles)
+            return cartesian_circle(radius, angles)
+
+        # Generate points on a circle and a logarithmic spiral for φ in [π/2;5π/4].
+        # These two curves intersect at a point (r=1, φ=5π/4) representing the
+        # extremity of the beak.
+        def generate_vertices(ncuts):
+            cut_angles = np.linspace(np.pi / 2, 5 * np.pi / 4, ncuts)
+            outer_circle = cartesian_circle(1, cut_angles)
+
+            # circle_x(φ) = r*cos(φ)
+            # spiral_x(φ) = a*exp(kφ)*cos(φ)
+            # k = ln(r/a) / φ where r=1 and φ=5π/4
+            a = 0.5 # a != 0 and a != r
+            k = (4 * np.log(1 / a)) / (5 * np.pi)
+            inner_spiral = cartesian_log_spiral(a, k, cut_angles)
+
+            assert(outer_circle[-1] == inner_spiral[-1])
+            return outer_circle, inner_spiral
+
+        outer_circle, inner_spiral = generate_vertices(ncuts=4)
+        mesh = bpy.data.meshes.new('Beak')
+        mesh.from_pydata(
+            vertices = outer_circle + inner_spiral[:-1],
+            edges = (),
+            faces = (),
+        )
+        shared.mesh.shade(mesh, smooth=True)
+        obj = bpy.data.objects.new('Beak', mesh)
+        return obj
 
     @classmethod
     def new_wings(cls, anchor):
