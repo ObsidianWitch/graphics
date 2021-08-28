@@ -128,12 +128,19 @@ class Owl:
             assert(outer_circle[-1] == inner_spiral[-1])
             return outer_circle, inner_spiral
 
+        def generate_faces(curve1, curve2):
+            assert(len(curve1) == len(curve2))
+            faces = [ (i, i - 1, i + len(curve1) - 1, i + len(curve1))
+                      for i in range(1, len(curve1) - 1) ]
+            faces.append((len(curve1) - 1, len(curve1) - 2, 2 * len(curve1) - 2))
+            return faces
+
         outer_circle, inner_spiral = generate_vertices(ncuts=4)
         mesh = bpy.data.meshes.new('Beak')
         mesh.from_pydata(
             vertices = outer_circle + inner_spiral[:-1],
             edges = (),
-            faces = (),
+            faces = generate_faces(outer_circle, inner_spiral),
         )
         shared.mesh.shade(mesh, smooth=True)
         obj = bpy.data.objects.new('Beak', mesh)
