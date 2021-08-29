@@ -15,7 +15,7 @@ import shared.mesh
 # Create a template cube.
 def new_cube():
     # mesh & object (alt: bpy.ops.mesh.primitive_cube_add())
-    obj = shared.mesh.new_cube()
+    obj = shared.mesh.new_obj(bmesh.ops.create_cube, name='Cube')
 
     # modifiers
     obj.modifiers.new(name='Wireframe', type='WIREFRAME')

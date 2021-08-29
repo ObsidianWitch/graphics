@@ -39,7 +39,7 @@ class Owl:
     @classmethod
     def new_torso(cls):
         # mesh & object
-        obj = shared.mesh.new_cube(name='Torso', size=2)
+        obj = shared.mesh.new_obj(bmesh.ops.create_cube, name='Torso', size=2)
         shared.mesh.shade(obj.data, smooth=True)
 
         # modifiers
@@ -100,59 +100,20 @@ class Owl:
 
     @classmethod
     def new_face_beak(cls):
-        def cartesian_circle(radius, angles):
-            return tuple(zip(
-                [0] * len(angles),
-                radius * np.cos(angles),
-                radius * np.sin(angles),
-            ))
+        height = 0.5
+        obj = shared.mesh.new_obj(bmesh.ops.create_cone, name="Beak",
+            segments=4, diameter1=0.35, diameter2=1e-3, depth=height)
+        shared.mesh.shade(obj.data, smooth=True)
+        set_origin(obj, (0, 0, -height / 2))
+        obj.location.z = 0
+        obj.rotation_euler.x = math.pi / 2
 
-        def cartesian_log_spiral(a, k, angles):
-            radius = a * np.exp(k * angles)
-            return cartesian_circle(radius, angles)
-
-        # Generate points on a circle and a logarithmic spiral for φ in
-        # [start_angle;end_angle]. These two curves intersect at (r=1, φ=end_angle)
-        # representing the extremity of the beak.
-        def generate_vertices(start_angle=np.pi / 2, end_angle=np.pi, ncuts=4):
-            cut_angles = np.linspace(start_angle, end_angle, ncuts)
-            # add a cut near the beak extremity to control the subdivision
-            cut_angles = np.insert(cut_angles, -1, [ cut_angles[-1] - 0.01 ])
-
-            # circle
-            r = 1
-            outer_circle = cartesian_circle(r, cut_angles)
-
-            # log spiral intersecting w/ previous circle at (r, end_angle)
-            # circle_x(φ) = r*cos(φ)
-            # spiral_x(φ) = a*exp(kφ)*cos(φ)
-            # k = ln(r/a) / φ where a != r
-            a = 0.05
-            k = np.log(r / a) / end_angle
-            inner_spiral = cartesian_log_spiral(a, k, cut_angles)
-
-            return outer_circle, inner_spiral
-
-        def generate_faces(curve1, curve2):
-            assert(len(curve1) == len(curve2))
-            faces = [ (i, i - 1, i + len(curve1) - 1, i + len(curve1))
-                      for i in range(1, len(curve1) - 1) ]
-            faces.append((len(curve1) - 1, len(curve1) - 2, 2 * len(curve1) - 2))
-            return faces
-
-        outer_circle, inner_spiral = generate_vertices()
-        mesh = bpy.data.meshes.new('Beak')
-        mesh.from_pydata(
-            vertices = outer_circle + inner_spiral[:-1],
-            edges = (),
-            faces = generate_faces(outer_circle, inner_spiral),
-        )
-        shared.mesh.shade(mesh, smooth=True)
-
-        obj = bpy.data.objects.new('Beak', mesh)
-        set_origin(obj, inner_spiral[0] + (np.array(outer_circle[0]) - inner_spiral[0]) / 2)
-        obj.location = (0, 0, 0)
-        obj.scale = (0.45, 0.45, 0.45)
+        subdiv_mod = obj.modifiers.new(name='Subdivision', type='SUBSURF')
+        subdiv_mod.levels = subdiv_mod.render_levels = 2
+        deform_mod = obj.modifiers.new(name='SimpleDeform', type='SIMPLE_DEFORM')
+        deform_mod.deform_method = 'BEND'
+        deform_mod.deform_axis = 'X'
+        deform_mod.angle = -math.pi / 2
 
         return obj
 
