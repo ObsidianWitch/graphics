@@ -26,6 +26,11 @@ def delete_data():
         for item in data:
             data.remove(item)
 
+def dump(mesh):
+    print(f"vertices={[ tuple(v.co) for v in mesh.vertices ]}")
+    print(f"edges={[ tuple(e.vertices) for e in mesh.edges ]}")
+    print(f"faces={[ tuple(f.vertices) for f in mesh.polygons ]}")
+
 class ScriptResetRun(bpy.types.Operator):
     bl_idname = 'text.reset_run'
     bl_label = 'Reset and run script'
