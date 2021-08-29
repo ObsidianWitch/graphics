@@ -111,21 +111,26 @@ class Owl:
             radius = a * np.exp(k * angles)
             return cartesian_circle(radius, angles)
 
-        # Generate points on a circle and a logarithmic spiral for φ in [π/2;5π/4].
-        # These two curves intersect at a point (r=1, φ=5π/4) representing the
-        # extremity of the beak.
-        def generate_vertices(ncuts):
-            cut_angles = np.linspace(np.pi / 2, 5 * np.pi / 4, ncuts)
-            outer_circle = cartesian_circle(1, cut_angles)
+        # Generate points on a circle and a logarithmic spiral for φ in
+        # [start_angle;end_angle]. These two curves intersect at (r=1, φ=end_angle)
+        # representing the extremity of the beak.
+        def generate_vertices(start_angle=np.pi / 2, end_angle=np.pi, ncuts=4):
+            cut_angles = np.linspace(start_angle, end_angle, ncuts)
+            # add a cut near the beak extremity to control the subdivision
+            cut_angles = np.insert(cut_angles, -1, [ cut_angles[-1] - 0.01 ])
 
+            # circle
+            r = 1
+            outer_circle = cartesian_circle(r, cut_angles)
+
+            # log spiral intersecting w/ previous circle at (r, end_angle)
             # circle_x(φ) = r*cos(φ)
             # spiral_x(φ) = a*exp(kφ)*cos(φ)
-            # k = ln(r/a) / φ where r=1 and φ=5π/4
-            a = 0.5 # a != 0 and a != r
-            k = (4 * np.log(1 / a)) / (5 * np.pi)
+            # k = ln(r/a) / φ where a != r
+            a = 0.05
+            k = np.log(r / a) / end_angle
             inner_spiral = cartesian_log_spiral(a, k, cut_angles)
 
-            assert(outer_circle[-1] == inner_spiral[-1])
             return outer_circle, inner_spiral
 
         def generate_faces(curve1, curve2):
@@ -135,7 +140,7 @@ class Owl:
             faces.append((len(curve1) - 1, len(curve1) - 2, 2 * len(curve1) - 2))
             return faces
 
-        outer_circle, inner_spiral = generate_vertices(ncuts=4)
+        outer_circle, inner_spiral = generate_vertices()
         mesh = bpy.data.meshes.new('Beak')
         mesh.from_pydata(
             vertices = outer_circle + inner_spiral[:-1],
@@ -143,7 +148,12 @@ class Owl:
             faces = generate_faces(outer_circle, inner_spiral),
         )
         shared.mesh.shade(mesh, smooth=True)
+
         obj = bpy.data.objects.new('Beak', mesh)
+        set_origin(obj, inner_spiral[0] + (np.array(outer_circle[0]) - inner_spiral[0]) / 2)
+        obj.location = (0, 0, 0)
+        obj.scale = (0.45, 0.45, 0.45)
+
         return obj
 
     @classmethod
