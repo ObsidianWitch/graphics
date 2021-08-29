@@ -9,8 +9,8 @@ import bpy, bmesh
 from mathutils import Matrix, Vector
 import numpy as np
 if "." not in sys.path: sys.path.append(".")
+import shared
 import addons.script_reset
-import shared.mesh
 
 class Owl:
     @classmethod
@@ -39,8 +39,8 @@ class Owl:
     @classmethod
     def new_torso(cls):
         # mesh & object
-        obj = shared.mesh.new_obj(bmesh.ops.create_cube, name='Torso', size=2)
-        shared.mesh.shade(obj.data, smooth=True)
+        obj = shared.new_obj(bmesh.ops.create_cube, name='Torso', size=2)
+        shared.use_smooth(obj.data, True)
 
         # modifiers
         bevel_mod = obj.modifiers.new(name='Bevel', type='BEVEL')
@@ -70,7 +70,7 @@ class Owl:
             edges=(),
             faces=((0, 1, 2, 7), (7, 2, 3, 6), (6, 3, 4, 5)),
         )
-        shared.mesh.shade(mesh, smooth=True)
+        shared.use_smooth(mesh, True)
 
         # bmesh
         bm = bmesh.new()
@@ -101,10 +101,10 @@ class Owl:
     @classmethod
     def new_face_beak(cls):
         height = 0.5
-        obj = shared.mesh.new_obj(bmesh.ops.create_cone, name="Beak",
+        obj = shared.new_obj(bmesh.ops.create_cone, name="Beak",
             segments=4, diameter1=0.35, diameter2=1e-3, depth=height)
-        shared.mesh.shade(obj.data, smooth=True)
-        set_origin(obj, (0, 0, -height / 2))
+        shared.use_smooth(obj.data, True)
+        shared.set_origin(obj, (0, 0, -height / 2))
         obj.location.z = 0
         obj.rotation_euler.x = math.pi / 2
 
@@ -132,7 +132,7 @@ class Owl:
             edges = (),
             faces = ((1, 4, 5), (4, 2, 5), (2, 3, 5), (3, 0, 5), (0, 1, 5)),
         )
-        shared.mesh.shade(mesh, smooth=True)
+        shared.use_smooth(mesh, True)
 
         # object
         obj = bpy.data.objects.new('Wings', mesh)
@@ -179,7 +179,7 @@ class Owl:
         faces = ((3, 5, 4), (5, 2, 4), (0, 4, 2), (1, 4, 0, 6))
         mesh = bpy.data.meshes.new('Feather')
         mesh.from_pydata(vertices=vertices, edges=(), faces=faces)
-        shared.mesh.shade(mesh, smooth=True)
+        shared.use_smooth(mesh, True)
 
         # object
         obj = bpy.data.objects.new('Feather', mesh)
@@ -193,15 +193,9 @@ class Owl:
         mirrorz_mod.use_axis = (False, False, True)
 
         # origin
-        set_origin(obj, vertices[1])
+        shared.set_origin(obj, vertices[1])
 
         return obj
-
-# ref: https://blender.stackexchange.com/a/35830
-def set_origin(object, point):
-    point = Vector(point)
-    object.data.transform(Matrix.Translation(-point))
-    object.matrix_world.translation += point
 
 if __name__ == '__main__':
     # reset data
