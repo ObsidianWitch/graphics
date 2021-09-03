@@ -8,9 +8,12 @@ import sys, math
 import bpy, bmesh
 from mathutils import Matrix, Vector
 import numpy as np
-if "." not in sys.path: sys.path.append(".")
+
+if '.' not in sys.path:
+    sys.path.append('.')
+if 'shared' in sys.modules:
+    del sys.modules['shared']
 import shared
-import addons.script_reset
 
 class Owl:
     @classmethod
@@ -101,7 +104,7 @@ class Owl:
     @classmethod
     def new_face_beak(cls):
         height = 0.5
-        obj = shared.new_obj(bmesh.ops.create_cone, name="Beak",
+        obj = shared.new_obj(bmesh.ops.create_cone, name='Beak',
             segments=4, diameter1=0.35, diameter2=1e-3, depth=height)
         shared.use_smooth(obj.data, True)
         shared.set_origin(obj, (0, 0, -height / 2))
@@ -199,7 +202,7 @@ class Owl:
 
 if __name__ == '__main__':
     # reset data
-    addons.script_reset.delete_data()
+    shared.delete_data()
 
     # create character
     owl_collection = Owl.new()

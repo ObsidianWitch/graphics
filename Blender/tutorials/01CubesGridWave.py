@@ -8,9 +8,12 @@
 
 import sys, itertools, math
 import bpy, bmesh, mathutils
-if "." not in sys.path: sys.path.append(".")
+
+if '.' not in sys.path:
+    sys.path.append('.')
+if 'shared' in sys.modules:
+    del sys.modules['shared']
 import shared
-import addons.script_reset
 
 # Create a template cube.
 def new_cube():
@@ -85,7 +88,7 @@ def setup_scene(collection):
     scene.eevee.use_bloom = True
 
 if __name__ == '__main__':
-    addons.script_reset.delete_data()
+    shared.delete_data()
     cube = new_cube()
     grid = new_grid(obj=cube)
     setup_scene(collection=grid)
