@@ -57,7 +57,9 @@ class Owl:
         base = cls.new_face_base()
         beak = cls.new_face_beak()
         beak.parent = base
-        return [base, beak]
+        eyes = cls.new_face_eyes(mirror_object=beak)
+        eyes.parent = base
+        return [base, beak, eyes]
 
 
     @classmethod
@@ -118,6 +120,17 @@ class Owl:
         deform_mod.deform_axis = 'X'
         deform_mod.angle = -math.pi / 2
 
+        return obj
+
+    @classmethod
+    def new_face_eyes(cls, mirror_object):
+        obj = shared.new_obj(bmesh.ops.create_uvsphere, name='Eyes',
+            u_segments=16, v_segments=8, diameter=0.25)
+        shared.use_smooth(obj.data, True)
+        obj.scale.y = 0.25
+        obj.location = (0.45, -0.1, 0.2)
+        mirror_mod = obj.modifiers.new(name='Mirror', type='MIRROR')
+        mirror_mod.mirror_object = mirror_object
         return obj
 
     @classmethod
