@@ -25,3 +25,11 @@ def set_origin(object, point):
     point = Vector(point)
     object.data.transform(Matrix.Translation(-point))
     object.matrix_world.translation += point
+
+def bm_geom_split(geom):
+    return {
+        'geom': geom,
+        'verts': tuple(e for e in geom if isinstance(e, bmesh.types.BMVert)),
+        'edges': tuple(e for e in geom if isinstance(e, bmesh.types.BMEdge)),
+        'faces': tuple(e for e in geom if isinstance(e, bmesh.types.BMFace)),
+    }

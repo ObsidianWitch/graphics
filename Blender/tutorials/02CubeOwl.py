@@ -37,6 +37,10 @@ class Owl:
             feather.parent = torso
             collection.objects.link(feather)
 
+        legs = cls.new_legs(mirror_object=torso)
+        legs.parent = torso
+        collection.objects.link(legs)
+
         return collection
 
     @classmethod
@@ -60,7 +64,6 @@ class Owl:
         eyes = cls.new_face_eyes(mirror_object=beak)
         eyes.parent = base
         return [base, beak, eyes]
-
 
     @classmethod
     def new_face_base(cls):
@@ -210,6 +213,35 @@ class Owl:
 
         # origin
         shared.set_origin(obj, vertices[1])
+
+        return obj
+
+    @classmethod
+    def new_legs(cls, mirror_object):
+        bm = bmesh.new()
+
+        # tibia
+        _c1 = bmesh.ops.create_circle(bm, radius=0.2, segments=8)
+        c2 = bmesh.ops.extrude_edge_only(bm, edges=bm.edges)
+        c2 = shared.bm_geom_split(c2['geom'])
+        bmesh.ops.translate(bm, verts=c2['verts'], vec=(-0.25, 0.25, -0.25))
+        bmesh.ops.scale(bm, verts=c2['verts'], vec=(0.5, 0.5, 1.0))
+
+        # tarsometatarsus
+        c3 = bmesh.ops.extrude_edge_only(bm, edges=c2['edges'])
+        c3 = shared.bm_geom_split(c3['geom'])
+        bmesh.ops.translate(bm, verts=c3['verts'], vec=(0.125, -0.125, -0.20))
+        bmesh.ops.scale(bm, verts=c3['verts'], vec=(0.5, 0.5, 1.0))
+
+        mesh = bpy.data.meshes.new('Legs')
+        bm.to_mesh(mesh)
+        shared.use_smooth(mesh, True)
+        bm.free()
+
+        obj = bpy.data.objects.new('Legs', mesh)
+        obj.location = (0.5, 0.0, -1.0)
+        mirror_mod = obj.modifiers.new(name='Mirror', type='MIRROR')
+        mirror_mod.mirror_object = mirror_object
 
         return obj
 
