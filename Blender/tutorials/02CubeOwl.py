@@ -41,6 +41,10 @@ class Owl:
         legs.parent = torso
         collection.objects.link(legs)
 
+        claws = cls.new_claws(mirror_object=torso)
+        claws.parent = legs
+        collection.objects.link(claws)
+
         return collection
 
     @classmethod
@@ -244,6 +248,34 @@ class Owl:
         mirror_mod.mirror_object = mirror_object
 
         return obj
+
+    @classmethod
+    def new_claws(cls, mirror_object):
+        base = shared.new_obj(bmesh.ops.create_cone, name='Claws', segments=6,
+            diameter1=0.2, diameter2=0.2, depth=0.15, cap_ends=True)
+        base.rotation_euler.z = math.pi / 2
+        shared.obj_apply_transforms(base)
+
+        claws = []
+        for i in range(3):
+            claw = cls.new_face_beak()
+            claw = shared.obj_evaluate(claw, remove_src=True)
+            claws.append(claw)
+            claw.parent = base
+            claw.scale = (0.25, 0.25, 0.6)
+            claw.rotation_euler.x = math.pi / 2
+            claw.rotation_euler.z = math.radians((i * 60) - 60)
+            claw.location = ((i * 0.15) - 0.15, -0.08, 0.0)
+        claws[1].location.y = -0.16
+        for claw in claws:
+            shared.obj_apply_transforms(claw)
+
+        shared.obj_join([base] + claws, remove_src=True)
+        base.location = (0.0, -0.1, -0.5)
+        mirror_mod = base.modifiers.new(name='Mirror', type='MIRROR')
+        mirror_mod.mirror_object = mirror_object
+
+        return base
 
 if __name__ == '__main__':
     # reset data
