@@ -316,7 +316,7 @@ class Owl:
             claw.scale = (0.25, 0.25, 0.6)
             claw.rotation_euler.x = math.pi / 2
             claw.rotation_euler.z = math.radians((i * 60) - 60)
-            claw.location = ((i * 0.15) - 0.15, -0.08, 0.0)
+            claw.location = ((i * 0.15) - 0.15, -0.08, -0.01)
         claws[1].location.y = -0.16
         for claw in claws:
             shared.obj_apply_transforms(claw)
@@ -342,13 +342,37 @@ class Owl:
 
         return objs
 
-if __name__ == '__main__':
-    # reset data
-    shared.delete_data()
-
-    # create character
-    owl_collection = Owl.new()
-
-    # setup scene
+def setup_scene():
     scene = bpy.data.scenes[0]
+
+    # objects
+    owl_collection = Owl.new()
     scene.collection.children.link(owl_collection)
+
+    # camera
+    camera = bpy.data.objects.new('Camera', bpy.data.cameras.new('Camera'))
+    camera.location = (11.5, -16.5, 0.0)
+    camera.rotation_euler.x = math.radians(90)
+    camera.rotation_euler.z = math.radians(35)
+    scene.collection.objects.link(camera)
+
+    # lights
+    lkey = bpy.data.lights.new(name="LKey", type="AREA")
+    lkey = bpy.data.objects.new(lkey.name, lkey)
+    lkey.data.diffuse_factor = 100
+    lkey.location = (-3, -3, 3)
+    lkey.rotation_euler = (math.radians(52), math.radians(-7), math.radians(-40))
+    scene.collection.objects.link(lkey)
+
+    lfill = bpy.data.lights.new(name="LFill", type="POINT")
+    lfill = bpy.data.objects.new(lfill.name, lfill)
+    lfill.data.diffuse_factor = 100
+    lfill.location = (3, -3, 0)
+    scene.collection.objects.link(lfill)
+
+    # world
+    scene.eevee.use_bloom = True
+
+if __name__ == '__main__':
+    shared.delete_data()
+    setup_scene()
