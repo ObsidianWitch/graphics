@@ -58,6 +58,15 @@ class Owl:
         bevel_mod.width = 0.02
         bevel_mod.segments = 2
 
+        # materials
+        material = bpy.data.materials.new('Body')
+        material.use_nodes = True
+        obj.data.materials.append(material)
+        nodes = material.node_tree.nodes
+        nodes["Principled BSDF"].inputs['Base Color'].default_value = \
+            [0.25, 0.13, 0.05, 1.0]
+        nodes['Principled BSDF'].inputs['Specular'].default_value = 0.0
+
         return obj
 
     @classmethod
@@ -108,6 +117,15 @@ class Owl:
         subdiv_mod = obj.modifiers.new(name='Subdivision', type='SUBSURF')
         subdiv_mod.levels = subdiv_mod.render_levels = 2
 
+        material = bpy.data.materials.new('Face')
+        material.use_nodes = True
+        obj.data.materials.append(material)
+        nodes = material.node_tree.nodes
+        nodes["Principled BSDF"].inputs['Base Color'].default_value = \
+            [0.80, 0.62, 0.41, 1.0]
+        nodes['Principled BSDF'].inputs['Specular'].default_value = 0.0
+
+
         return obj
 
     @classmethod
@@ -127,6 +145,14 @@ class Owl:
         deform_mod.deform_axis = 'X'
         deform_mod.angle = -math.pi / 2
 
+        material = bpy.data.materials.new('Beak')
+        material.use_nodes = True
+        obj.data.materials.append(material)
+        nodes = material.node_tree.nodes
+        nodes["Principled BSDF"].inputs['Base Color'].default_value = \
+            [0.80, 0.39, 0.06, 1.0]
+        nodes['Principled BSDF'].inputs['Specular'].default_value = 0.0
+
         return obj
 
     @classmethod
@@ -136,8 +162,18 @@ class Owl:
         shared.use_smooth(obj.data, True)
         obj.scale.y = 0.25
         obj.location = (0.45, -0.1, 0.2)
+
         mirror_mod = obj.modifiers.new(name='Mirror', type='MIRROR')
         mirror_mod.mirror_object = mirror_object
+
+        material = bpy.data.materials.new('Eyes')
+        material.use_nodes = True
+        obj.data.materials.append(material)
+        nodes = material.node_tree.nodes
+        nodes["Principled BSDF"].inputs['Base Color'].default_value = \
+            [0.0, 0.0, 0.0, 1.0]
+        nodes['Principled BSDF'].inputs['Roughness'].default_value = 0.125
+
         return obj
 
     @classmethod
@@ -171,6 +207,10 @@ class Owl:
         mirror2_mod = obj.modifiers.new(name='MirrorObject', type='MIRROR')
         mirror2_mod.mirror_object = anchor
         bevel_mod = obj.modifiers.new(name='Bevel', type='BEVEL')
+
+        # materials
+        material = bpy.data.materials['Body']
+        obj.data.materials.append(material)
 
         return obj
 
@@ -215,6 +255,10 @@ class Owl:
         mirrorz_mod = obj.modifiers.new(name='MirrorZ', type='MIRROR')
         mirrorz_mod.use_axis = (False, False, True)
 
+        # materials
+        material = bpy.data.materials['Body']
+        obj.data.materials.append(material)
+
         # origin
         shared.set_origin(obj, vertices[1])
 
@@ -247,6 +291,9 @@ class Owl:
         mirror_mod = obj.modifiers.new(name='Mirror', type='MIRROR')
         mirror_mod.mirror_object = mirror_object
 
+        material = bpy.data.materials['Beak']
+        obj.data.materials.append(material)
+
         return obj
 
     @classmethod
@@ -274,6 +321,9 @@ class Owl:
         base.location = (0.0, -0.1, -0.5)
         mirror_mod = base.modifiers.new(name='Mirror', type='MIRROR')
         mirror_mod.mirror_object = mirror_object
+
+        material = bpy.data.materials['Beak']
+        base.data.materials.append(material)
 
         return base
 
