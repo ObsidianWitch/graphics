@@ -42,8 +42,9 @@ class Owl:
         collection.objects.link(legs)
 
         claws = cls.new_claws(mirror_object=torso)
-        claws.parent = legs
-        collection.objects.link(claws)
+        claws[0].parent = legs
+        for obj in claws:
+            collection.objects.link(obj)
 
         return collection
 
@@ -298,11 +299,14 @@ class Owl:
 
     @classmethod
     def new_claws(cls, mirror_object):
+        # feet
         base = shared.new_obj(bmesh.ops.create_cone, name='Claws', segments=6,
             diameter1=0.2, diameter2=0.2, depth=0.15, cap_ends=True)
         base.rotation_euler.z = math.pi / 2
         shared.obj_apply_transforms(base)
+        base.location = (0.0, -0.1, -0.5)
 
+        # claws
         claws = []
         for i in range(3):
             claw = cls.new_face_beak()
@@ -316,16 +320,27 @@ class Owl:
         claws[1].location.y = -0.16
         for claw in claws:
             shared.obj_apply_transforms(claw)
+        shared.obj_join(claws, remove_src=True)
+        claws = claws[0]
 
-        shared.obj_join([base] + claws, remove_src=True)
-        base.location = (0.0, -0.1, -0.5)
-        mirror_mod = base.modifiers.new(name='Mirror', type='MIRROR')
-        mirror_mod.mirror_object = mirror_object
+        # modifiers
+        objs = [base, claws]
+        for obj in objs:
+            mirror_mod = obj.modifiers.new(name='Mirror', type='MIRROR')
+            mirror_mod.mirror_object = mirror_object
 
-        material = bpy.data.materials['Beak']
-        base.data.materials.append(material)
+        # materials
+        base.data.materials.append(bpy.data.materials['Beak'])
 
-        return base
+        material = bpy.data.materials.new('Claws')
+        material.use_nodes = True
+        claws.data.materials.append(material)
+        nodes = material.node_tree.nodes
+        nodes["Principled BSDF"].inputs['Base Color'].default_value = \
+            [0.060, 0.037, 0.026, 1.0]
+        nodes['Principled BSDF'].inputs['Specular'].default_value = 0.0
+
+        return objs
 
 if __name__ == '__main__':
     # reset data
