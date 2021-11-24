@@ -25,7 +25,34 @@ def create_plane(bm, fill):
 class Character:
     @classmethod
     def list(cls):
-        return [cls.legs()]
+        return [cls.torso(), cls.legs()]
+
+    @classmethod
+    def torso(cls):
+        bm = bmesh.new()
+
+        luppertop = create_plane(bm, fill=False)
+        bmesh.ops.scale(bm, verts=luppertop['verts'], vec=(0.14, 0.1, 1.0))
+        bmesh.ops.translate(bm, verts=luppertop['verts'], vec=(0.0, 0.015, 1.352))
+
+        luppermid = create_plane(bm, fill=False)
+        bmesh.ops.scale(bm, verts=luppermid['verts'], vec=(0.24, 0.18, 1.0))
+        bmesh.ops.translate(bm, verts=luppermid['verts'], vec=(0.0, -0.017, 1.21))
+
+        lwaist = create_plane(bm, fill=False)
+        bmesh.ops.scale(bm, verts=lwaist['verts'], vec=(0.14, 0.11, 1.0))
+        bmesh.ops.translate(bm, verts=lwaist['verts'], vec=(0.0, -0.02, 1.076))
+
+        lbot = create_plane(bm, fill=False)
+        bmesh.ops.scale(bm, verts=lbot['verts'], vec=(0.23, 0.16, 1.0))
+        bmesh.ops.translate(bm, verts=lbot['verts'], vec=(0.0, -0.004, 0.999))
+
+        bmesh.ops.bridge_loops(bm, edges=bm.edges)
+
+        mesh = bpy.data.meshes.new('torso')
+        bm.to_mesh(mesh)
+        bm.free()
+        return bpy.data.objects.new('torso', mesh)
 
     @classmethod
     def legs(cls):
@@ -70,7 +97,7 @@ def setup_reference():
         obj.hide_viewport = True
         obj.show_in_front = True
         obj.display_type = 'WIRE'
-    references['leg'].hide_viewport = False
+    references['torso'].hide_viewport = False
 
 def setup_scene():
     scene = bpy.data.scenes[0]
