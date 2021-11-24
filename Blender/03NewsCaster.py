@@ -3,8 +3,12 @@
 # blender: 2.93
 # ref: Mega Man Legends News Caster
 
-import sys
-import bpy
+import sys, math
+import bpy, bmesh
+from mathutils import Matrix
+Diagonal = Matrix.Diagonal
+Rotation = Matrix.Rotation
+Translation = Matrix.Translation
 
 if '.' not in sys.path:
     sys.path.append('.')
@@ -12,10 +16,50 @@ if 'shared' in sys.modules:
     del sys.modules['shared']
 import shared
 
+def create_plane(bm, fill):
+    result = bmesh.ops.create_grid(bm, x_segments=0, y_segments=0, size=0.5)
+    if not fill:
+        bmesh.ops.delete(bm, geom=result['verts'][0].link_faces, context='FACES_ONLY')
+    return result
+
 class Character:
     @classmethod
     def list(cls):
-        return []
+        return [cls.legs()]
+
+    @classmethod
+    def legs(cls):
+        bm = bmesh.new()
+        ltop = create_plane(bm, fill=False)
+        bmesh.ops.scale(bm, verts=ltop['verts'], vec=(0.16, 0.16, 1.0))
+        bmesh.ops.scale(bm, verts=ltop['verts'][1::2], vec=(1.0, 1.15, 1.0))
+        bmesh.ops.translate(bm, verts=ltop['verts'], vec=(0.0794, 0.016, 0.83))
+        bmesh.ops.translate(bm, verts=ltop['verts'][1::2], vec=(0.0, 0.0, 0.084))
+
+        lmid = create_plane(bm, fill=False)
+        bmesh.ops.scale(bm, verts=lmid['verts'], vec=(0.1, 0.1, 1.0))
+        bmesh.ops.translate(bm, verts=lmid['verts'], vec=(0.065, 0.025, 0.55))
+
+        lbot = create_plane(bm, fill=False)
+        bmesh.ops.scale(bm, verts=lbot['verts'], vec=(0.1, 0.1, 1.0))
+        bmesh.ops.translate(bm, verts=lbot['verts'], vec=(0.06566, 0.033125, 0.0))
+        bmesh.ops.translate(bm, verts=lbot['verts'][0:2], vec=(0.0, 0.0, 0.15))
+
+        lfeet = create_plane(bm, fill=True)
+        bmesh.ops.scale(bm, verts=lfeet['verts'], vec=(0.1, 0.06, 1.0))
+        bmesh.ops.translate(bm, verts=lfeet['verts'], vec=(0.06625, -0.178+0.03, 0.0))
+        bmesh.ops.rotate(bm, verts=lfeet['verts'], cent=lfeet['verts'][0].co,
+                         matrix=Rotation(math.radians(80), 4, 'X'))
+
+        bmesh.ops.bridge_loops(bm, edges=bm.edges)
+
+        mesh = bpy.data.meshes.new('legs')
+        bm.to_mesh(mesh)
+        bm.free()
+
+        object = bpy.data.objects.new('legs', mesh)
+        object.modifiers.new(name='mirror', type='MIRROR')
+        return object
 
 def setup_reference():
     bpy.ops.wm.append(filepath="03Reference.blend/Collection/References",
