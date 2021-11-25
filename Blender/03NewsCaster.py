@@ -25,13 +25,32 @@ def create_plane(bm, fill):
 class Character:
     @classmethod
     def list(cls):
-        return [cls.torso(), cls.arms(), cls.legs()]
+        return [cls.neck(), cls.torso(), cls.arms(), cls.legs()]
+
+    @classmethod
+    def neck(cls):
+        bm = bmesh.new()
+
+        lneck1 = create_plane(bm, fill=False)
+        bmesh.ops.scale(bm, verts=lneck1['verts'], vec=(0.07, 0.06, 1.0))
+        bmesh.ops.scale(bm, verts=lneck1['verts'][2:], vec=(0.0, 1.07, 1.0))
+        bmesh.ops.translate(bm, verts=lneck1['verts'], vec=(0.0, 0.02, 1.35))
+
+        bmesh.ops.extrude_edge_only(bm, edges=bm.edges)
+        bmesh.ops.translate(bm, verts=bm.verts[-4:], vec=(0.0, 0.0, 0.07))
+
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
+
+        mesh = bpy.data.meshes.new('neck')
+        bm.to_mesh(mesh)
+        bm.free()
+        return bpy.data.objects.new('neck', mesh)
 
     @classmethod
     def torso(cls):
         bm = bmesh.new()
 
-        luppertop = create_plane(bm, fill=False)
+        luppertop = create_plane(bm, fill=True)
         bmesh.ops.scale(bm, verts=luppertop['verts'], vec=(0.14, 0.1, 1.0))
         bmesh.ops.translate(bm, verts=luppertop['verts'], vec=(0.0, 0.015, 1.352))
 
@@ -153,7 +172,7 @@ def setup_reference():
         obj.hide_viewport = True
         obj.show_in_front = True
         obj.display_type = 'WIRE'
-    references['arm'].hide_viewport = False
+    references['head'].hide_viewport = False
 
 def setup_scene():
     scene = bpy.data.scenes[0]
