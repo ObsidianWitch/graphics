@@ -5,7 +5,7 @@
 
 import sys, math
 import bpy, bmesh
-from mathutils import Matrix
+from mathutils import Matrix, Vector
 Diagonal = Matrix.Diagonal
 Rotation = Matrix.Rotation
 Translation = Matrix.Translation
@@ -25,7 +25,66 @@ def create_plane(bm, fill):
 class Character:
     @classmethod
     def list(cls):
-        return [cls.neck(), cls.torso(), cls.arms(), cls.legs()]
+        return [cls.head(), cls.nose(), cls.neck(), cls.torso(), cls.arms(),
+                cls.legs()]
+
+    @classmethod
+    def head(cls):
+        bm = bmesh.new()
+
+        sphv = bmesh.ops.create_uvsphere(bm, u_segments=6, v_segments=5,
+            diameter=0.5)['verts']
+        bmesh.ops.scale(bm, verts=sphv, vec=(0.36, 0.37, 0.35))
+        bmesh.ops.translate(bm, verts=sphv, vec=(0.0, 0.03, 1.53))
+        bmesh.ops.bisect_plane(bm, geom=sphv, dist=0.0000001, plane_co=(0, 0, 0),
+            plane_no=(1, 0, 0), clear_inner=True)
+        sphv = bm.verts[:]
+
+        # tweak right
+        sphv[16].co.z -= 0.01
+        sphv[11].co.y -= 0.02
+        bmesh.ops.translate(bm, verts=sphv[1:14:4], vec=(0.0, 0.0, -0.03))
+        sphv[13].co.y += 0.015
+        sphv[1].co.y -= 0.04
+        sphv[14].co.y -= 0.01
+        sphv[15].co.z = sphv[14].co.z
+        bmesh.ops.rotate(bm, cent=sphv[15].co, verts=sphv[2:15:4] + sphv[15:16],
+            matrix=Rotation(math.radians(10), 4, 'X'))
+        bmesh.ops.scale(bm, verts=sphv[7:11], vec=(1.0, 0.0, 1.0))
+        bmesh.ops.translate(bm, verts=sphv[7:11], vec=(0.0, -0.08, 0.0))
+        sphv[10].co.z += 0.015
+
+        # tweak front
+        sphv[9].co.x -= 0.045
+        sphv[5].co.x = sphv[9].co.x
+        sphv[10].co.x -= 0.035
+
+        # hair back spike
+        pokev = bmesh.ops.poke(bm, faces=sphv[2].link_faces[0:1])['verts']
+        pokev[0].co += Vector((-pokev[0].co.x, 0.06, -0.09))
+        bmesh.ops.pointmerge(bm, verts=(pokev[0], sphv[2]), merge_co=pokev[0].co)
+        mesh = bpy.data.meshes.new('head')
+        bm.to_mesh(mesh)
+        bm.free()
+
+        object = bpy.data.objects.new('head', mesh)
+        object.modifiers.new(name='mirror', type='MIRROR')
+        return object
+
+    @classmethod
+    def nose(cls):
+        bm = bmesh.new()
+        conev = bmesh.ops.create_cone(bm, segments=3, diameter1=1.0,
+            diameter2=0.0, depth=1.0)['verts']
+        bmesh.ops.rotate(bm, verts=conev, matrix=Rotation(math.radians(90), 3, 'X'))
+        bmesh.ops.scale(bm, verts=conev, vec=(0.02, 0.04, 0.04))
+        bmesh.ops.translate(bm, verts=conev, vec=(0.0, -0.122, 1.443))
+        conev[0].co.y -= 0.01
+
+        mesh = bpy.data.meshes.new('nose')
+        bm.to_mesh(mesh)
+        bm.free()
+        return bpy.data.objects.new('nose', mesh)
 
     @classmethod
     def neck(cls):
