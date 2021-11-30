@@ -63,13 +63,14 @@ class Character:
         pokev = bmesh.ops.poke(bm, faces=sphv[2].link_faces[0:1])['verts']
         pokev[0].co += Vector((-pokev[0].co.x, 0.06, -0.09))
         bmesh.ops.pointmerge(bm, verts=(pokev[0], sphv[2]), merge_co=pokev[0].co)
+
+        bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.faces[:], merge_dist=0.001, axis='X')
+
         mesh = bpy.data.meshes.new('head')
         bm.to_mesh(mesh)
         bm.free()
 
-        object = bpy.data.objects.new('head', mesh)
-        object.modifiers.new(name='mirror', type='MIRROR')
-        return object
+        return bpy.data.objects.new(mesh.name, mesh)
 
     @classmethod
     def nose(cls):
@@ -84,7 +85,8 @@ class Character:
         mesh = bpy.data.meshes.new('nose')
         bm.to_mesh(mesh)
         bm.free()
-        return bpy.data.objects.new('nose', mesh)
+
+        return bpy.data.objects.new(mesh.name, mesh)
 
     @classmethod
     def neck(cls):
@@ -103,7 +105,8 @@ class Character:
         mesh = bpy.data.meshes.new('neck')
         bm.to_mesh(mesh)
         bm.free()
-        return bpy.data.objects.new('neck', mesh)
+
+        return bpy.data.objects.new(mesh.name, mesh)
 
     @classmethod
     def torso(cls):
@@ -130,7 +133,8 @@ class Character:
         mesh = bpy.data.meshes.new('torso')
         bm.to_mesh(mesh)
         bm.free()
-        return bpy.data.objects.new('torso', mesh)
+
+        return bpy.data.objects.new(mesh.name, mesh)
 
     @classmethod
     def arms(cls):
@@ -179,14 +183,13 @@ class Character:
 
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
+        bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.faces[:], axis='X')
 
         mesh = bpy.data.meshes.new('arms')
         bm.to_mesh(mesh)
         bm.free()
 
-        object = bpy.data.objects.new('arms', mesh)
-        object.modifiers.new(name='mirror', type='MIRROR')
-        return object
+        return bpy.data.objects.new(mesh.name, mesh)
 
     @classmethod
     def legs(cls):
@@ -194,7 +197,7 @@ class Character:
         ltop = create_plane(bm, fill=False)
         bmesh.ops.scale(bm, verts=ltop['verts'], vec=(0.16, 0.16, 1.0))
         bmesh.ops.scale(bm, verts=ltop['verts'][1::2], vec=(1.0, 1.15, 1.0))
-        bmesh.ops.translate(bm, verts=ltop['verts'], vec=(0.0794, 0.016, 0.83))
+        bmesh.ops.translate(bm, verts=ltop['verts'], vec=(0.08, 0.016, 0.83))
         bmesh.ops.translate(bm, verts=ltop['verts'][1::2], vec=(0.0, 0.0, 0.084))
 
         lmid = create_plane(bm, fill=False)
@@ -213,14 +216,13 @@ class Character:
                          matrix=Rotation(math.radians(80), 4, 'X'))
 
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
+        bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.faces[:], merge_dist=0.001, axis='X')
 
         mesh = bpy.data.meshes.new('legs')
         bm.to_mesh(mesh)
         bm.free()
 
-        object = bpy.data.objects.new('legs', mesh)
-        object.modifiers.new(name='mirror', type='MIRROR')
-        return object
+        return bpy.data.objects.new(mesh.name, mesh)
 
 def setup_reference():
     bpy.ops.wm.append(filepath="03Reference.blend/Collection/References",
@@ -231,7 +233,7 @@ def setup_reference():
         obj.hide_viewport = True
         obj.show_in_front = True
         obj.display_type = 'WIRE'
-    references['head'].hide_viewport = False
+    references['pelvis'].hide_viewport = False
 
 def setup_scene():
     scene = bpy.data.scenes[0]
