@@ -15,6 +15,54 @@ if 'shared' in sys.modules:
     del sys.modules['shared']
 import shared
 
+def use_smooth(mesh, value):
+    for p in mesh.polygons:
+        p.use_smooth = value
+
+# ref: https://blender.stackexchange.com/a/35830
+def set_origin(object, point):
+    point = Vector(point)
+    object.data.transform(Matrix.Translation(-point))
+    object.matrix_world.translation += point
+
+def obj_apply_transforms(obj):
+    obj.data.transform(obj.matrix_basis)
+    obj.matrix_basis.identity()
+
+# note: Object.evaluated_get(evaluated_depsgraph) is an alternative but it
+# requires the object being linked to a collection, which is inconvenient.
+def obj_evaluate(obj, remove_src=False):
+    bm = bmesh.new()
+    bm.from_object(obj, bpy.context.evaluated_depsgraph_get())
+    mesh_eval = bpy.data.meshes.new(obj.data.name)
+    bm.to_mesh(mesh_eval)
+    obj_eval = bpy.data.objects.new(obj.name, mesh_eval)
+    bm.free()
+    if remove_src:
+        bpy.data.meshes.remove(obj.data) # removes both the mesh and object
+    return obj_eval
+
+# ref: https://blender.stackexchange.com/a/133024
+def obj_join(sources, remove_src=False):
+    assert all(type(obj) == bpy.types.Object for obj in sources)
+
+    ctx = {}
+    ctx["selected_objects"] = ctx["selected_editable_objects"] = sources
+    ctx["object"] = ctx["active_object"] = sources[0]
+    bpy.ops.object.join(ctx)
+    if remove_src:
+        for src in sources[1:]:
+            bpy.data.meshes.remove(src.data) # removes both the mesh and object
+    return sources[0]
+
+def bm_geom_split(geom):
+    return {
+        'geom': geom,
+        'verts': tuple(e for e in geom if isinstance(e, bmesh.types.BMVert)),
+        'edges': tuple(e for e in geom if isinstance(e, bmesh.types.BMEdge)),
+        'faces': tuple(e for e in geom if isinstance(e, bmesh.types.BMFace)),
+    }
+
 class Owl:
     @classmethod
     def new(cls):
@@ -52,7 +100,7 @@ class Owl:
     def new_torso(cls):
         # mesh & object
         obj = shared.new_obj(bmesh.ops.create_cube, name='Torso', size=2)
-        shared.use_smooth(obj.data, True)
+        use_smooth(obj.data, True)
 
         # modifiers
         bevel_mod = obj.modifiers.new(name='Bevel', type='BEVEL')
@@ -92,7 +140,7 @@ class Owl:
             edges=(),
             faces=((0, 1, 2, 7), (7, 2, 3, 6), (6, 3, 4, 5)),
         )
-        shared.use_smooth(mesh, True)
+        use_smooth(mesh, True)
 
         # bmesh
         bm = bmesh.new()
@@ -134,8 +182,8 @@ class Owl:
         height = 0.5
         obj = shared.new_obj(bmesh.ops.create_cone, name='Beak',
             segments=4, diameter1=0.35, diameter2=1e-3, depth=height)
-        shared.use_smooth(obj.data, True)
-        shared.set_origin(obj, (0, 0, -height / 2))
+        use_smooth(obj.data, True)
+        set_origin(obj, (0, 0, -height / 2))
         obj.location.z = 0
         obj.rotation_euler.x = math.pi / 2
 
@@ -160,7 +208,7 @@ class Owl:
     def new_face_eyes(cls, mirror_object):
         obj = shared.new_obj(bmesh.ops.create_uvsphere, name='Eyes',
             u_segments=16, v_segments=8, diameter=0.25)
-        shared.use_smooth(obj.data, True)
+        use_smooth(obj.data, True)
         obj.scale.y = 0.25
         obj.location = (0.45, -0.1, 0.2)
 
@@ -192,7 +240,7 @@ class Owl:
             edges = (),
             faces = ((1, 4, 5), (4, 2, 5), (2, 3, 5), (3, 0, 5), (0, 1, 5)),
         )
-        shared.use_smooth(mesh, True)
+        use_smooth(mesh, True)
 
         # object
         obj = bpy.data.objects.new('Wings', mesh)
@@ -243,7 +291,7 @@ class Owl:
         faces = ((3, 5, 4), (5, 2, 4), (0, 4, 2), (1, 4, 0, 6))
         mesh = bpy.data.meshes.new('Feather')
         mesh.from_pydata(vertices=vertices, edges=(), faces=faces)
-        shared.use_smooth(mesh, True)
+        use_smooth(mesh, True)
 
         # object
         obj = bpy.data.objects.new('Feather', mesh)
@@ -261,7 +309,7 @@ class Owl:
         obj.data.materials.append(material)
 
         # origin
-        shared.set_origin(obj, vertices[1])
+        set_origin(obj, vertices[1])
 
         return obj
 
@@ -272,19 +320,19 @@ class Owl:
         # tibia
         _c1 = bmesh.ops.create_circle(bm, radius=0.2, segments=8)
         c2 = bmesh.ops.extrude_edge_only(bm, edges=bm.edges)
-        c2 = shared.bm_geom_split(c2['geom'])
+        c2 = bm_geom_split(c2['geom'])
         bmesh.ops.translate(bm, verts=c2['verts'], vec=(-0.25, 0.25, -0.25))
         bmesh.ops.scale(bm, verts=c2['verts'], vec=(0.5, 0.5, 1.0))
 
         # tarsometatarsus
         c3 = bmesh.ops.extrude_edge_only(bm, edges=c2['edges'])
-        c3 = shared.bm_geom_split(c3['geom'])
+        c3 = bm_geom_split(c3['geom'])
         bmesh.ops.translate(bm, verts=c3['verts'], vec=(0.125, -0.125, -0.20))
         bmesh.ops.scale(bm, verts=c3['verts'], vec=(0.5, 0.5, 1.0))
 
         mesh = bpy.data.meshes.new('Legs')
         bm.to_mesh(mesh)
-        shared.use_smooth(mesh, True)
+        use_smooth(mesh, True)
         bm.free()
 
         obj = bpy.data.objects.new('Legs', mesh)
@@ -303,14 +351,14 @@ class Owl:
         base = shared.new_obj(bmesh.ops.create_cone, name='Claws', segments=6,
             diameter1=0.2, diameter2=0.2, depth=0.15, cap_ends=True)
         base.rotation_euler.z = math.pi / 2
-        shared.obj_apply_transforms(base)
+        obj_apply_transforms(base)
         base.location = (0.0, -0.1, -0.5)
 
         # claws
         claws = []
         for i in range(3):
             claw = cls.new_face_beak()
-            claw = shared.obj_evaluate(claw, remove_src=True)
+            claw = obj_evaluate(claw, remove_src=True)
             claws.append(claw)
             claw.parent = base
             claw.scale = (0.25, 0.25, 0.6)
@@ -319,8 +367,8 @@ class Owl:
             claw.location = ((i * 0.15) - 0.15, -0.08, -0.01)
         claws[1].location.y = -0.16
         for claw in claws:
-            shared.obj_apply_transforms(claw)
-        shared.obj_join(claws, remove_src=True)
+            obj_apply_transforms(claw)
+        obj_join(claws, remove_src=True)
         claws = claws[0]
 
         # modifiers
