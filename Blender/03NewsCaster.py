@@ -24,16 +24,17 @@ def create_plane(bm, fill):
 
 def bm_absorb_obj(bm, obj):
     bm.from_mesh(obj.data)
-    bpy.data.meshes.remove(obj.data)
+    bpy.data.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
 
 class Character:
     # Returns a list containing objects for each unconnected body part.
-    # Side effect: adds the corresponding meshes and objects to bpy.data.
     @classmethod
     def list(cls):
         return [cls.head(), cls.nose(), cls.neck(), cls.torso(), cls.arms(),
                 cls.legs()]
 
+    # Returns a single object containing all the body parts. Also connects the
+    # torso and legs.
     @classmethod
     def obj(cls):
         bm = bmesh.new()
@@ -56,11 +57,16 @@ class Character:
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
 
+        # mesh & object
         mesh = bpy.data.meshes.new('character')
         bm.to_mesh(mesh)
         bm.free()
+        obj = bpy.data.objects.new(mesh.name, mesh)
 
-        return bpy.data.objects.new(mesh.name, mesh)
+        # material
+        cls.apply_material(obj)
+
+        return obj
 
     @classmethod
     def head(cls):
@@ -255,6 +261,16 @@ class Character:
         bm.free()
 
         return bpy.data.objects.new(mesh.name, mesh)
+
+    @classmethod
+    def apply_material(cls, obj):
+        material = bpy.data.materials.new(name='Material')
+        material.use_nodes = True
+
+        nodes = material.node_tree.nodes
+        nodes['Principled BSDF'].inputs['Specular'].default_value = 0.0
+
+        obj.data.materials.append(material)
 
 def setup_reference():
     bpy.ops.wm.append(filepath="03Reference.blend/Collection/References",
