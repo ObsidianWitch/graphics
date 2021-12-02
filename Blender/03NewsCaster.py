@@ -27,19 +27,13 @@ def bm_absorb_obj(bm, obj):
     bpy.data.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
 
 class Character:
-    # Returns a list containing objects for each unconnected body part.
-    @classmethod
-    def list(cls):
-        return [cls.head(), cls.nose(), cls.neck(), cls.torso(), cls.arms(),
-                cls.legs()]
+    def __init__(self, name='Character'):
+        cls = self.__class__
 
-    # Returns a single object containing all the body parts. Also connects the
-    # torso and legs.
-    @classmethod
-    def obj(cls):
+        # mesh & object
         bm = bmesh.new()
 
-        # create pelvis from torso and legs
+        ## create pelvis from torso and legs
         bm_absorb_obj(bm, cls.torso())
         bm_absorb_obj(bm, cls.legs())
         bmesh.ops.bridge_loops(bm, edges=bm.edges[6:8] + bm.edges[17:18] + bm.edges[25:29])
@@ -49,7 +43,7 @@ class Character:
         bm.verts[33].co.y = bm.verts[19].co.y
         bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=0.0001)
 
-        # add remaining parts
+        ## add remaining parts
         bm_absorb_obj(bm, cls.head())
         bm_absorb_obj(bm, cls.arms())
         bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
@@ -57,16 +51,12 @@ class Character:
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
 
-        # mesh & object
-        mesh = bpy.data.meshes.new('character')
-        bm.to_mesh(mesh)
+        self.obj = bpy.data.objects.new(name, bpy.data.meshes.new(name))
+        bm.to_mesh(self.obj.data)
         bm.free()
-        obj = bpy.data.objects.new(mesh.name, mesh)
 
         # material
-        cls.apply_material(obj)
-
-        return obj
+        self.obj.data.materials.append(cls.material())
 
     @classmethod
     def head(cls):
@@ -263,14 +253,14 @@ class Character:
         return bpy.data.objects.new(mesh.name, mesh)
 
     @classmethod
-    def apply_material(cls, obj):
+    def material(cls):
         material = bpy.data.materials.new(name='Material')
         material.use_nodes = True
 
         nodes = material.node_tree.nodes
         nodes['Principled BSDF'].inputs['Specular'].default_value = 0.0
 
-        obj.data.materials.append(material)
+        return material
 
 def setup_reference():
     bpy.ops.wm.append(filepath="03Reference.blend/Collection/References",
@@ -284,7 +274,7 @@ def setup_reference():
 
 def setup_scene():
     scene = bpy.data.scenes[0]
-    scene.collection.objects.link(Character.obj())
+    scene.collection.objects.link(Character().obj)
 
 if __name__ == '__main__':
     shared.delete_data()
