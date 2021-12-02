@@ -262,10 +262,13 @@ class Character:
 
         return material
 
+def import_from_blend(filepath, type, name):
+    bpy.ops.wm.append(filepath  = f"{filepath}/{type}/{name}",
+                      directory = f"{filepath}/{type}",
+                      filename  = name)
+
 def setup_reference():
-    bpy.ops.wm.append(filepath="03Reference.blend/Collection/References",
-                      directory="03Reference.blend/Collection",
-                      filename="References")
+    import_from_blend('03Reference.blend', 'Collection', 'References')
     references = bpy.data.collections['References'].objects
     for obj in references:
         obj.hide_viewport = False
