@@ -134,10 +134,10 @@ References:
 <use id="circle21" class="circle" href="#cdef"/>
 <use id="circle22" href="#cdef"/>
 <text id="cmd1" class="cmd" textLength="210%">
-    <textPath href="#cdef">placeholder</textPath>
+    <textPath href="#cdef">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo vel neque nec venenatis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Mauris placerat commodo magna nec ornare. Donec laoreet viverra semper. Integer scelerisque tristique orci, a vehicula diam scelerisque ac.</textPath>
 </text>
 <text id="cmd2" class="cmd" textLength="210%">
-    <textPath href="#cdef">placeholder</textPath>
+    <textPath href="#cdef">▘▆▔▍▍▒▏▆░▀▛▃▂▆▝░▌▜▌▛▝▖▒▅▕▕▍▉▉▞▟░▗▗▜▁ ▞ ▊▎▚▃▆▎▞▛▊▉▎░▟█▛▍▞▋▙░▓▕▓▏▁▒▗▞▘▗▘▏▐▏▐▎▝▐▌▊▏▜▓▇▉▄▋▊▜▌ ▃█▍░▅▇▟▇▘▋▂▁▖▉▀░▜▋▏▒▚▘▞▅▅ ▏▆▘▋▞▛▚ ▗▇▃▏▉ </textPath>
 </text>
 
 <script>
