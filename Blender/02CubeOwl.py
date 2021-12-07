@@ -1,7 +1,7 @@
 #!/usr/bin/env -S blender --factory-startup --python
 
 # name: Cube Owl
-# blender: 2.93.0
+# blender: 3.0
 # ref: https://cloud.blender.org/training/primitive-animals/
 
 import sys, math
@@ -181,7 +181,7 @@ class Owl:
     def new_face_beak(cls):
         height = 0.5
         obj = shared.new_obj(bmesh.ops.create_cone, name='Beak',
-            segments=4, diameter1=0.35, diameter2=1e-3, depth=height)
+            segments=4, radius1=0.35, radius2=1e-3, depth=height)
         use_smooth(obj.data, True)
         set_origin(obj, (0, 0, -height / 2))
         obj.location.z = 0
@@ -207,7 +207,7 @@ class Owl:
     @classmethod
     def new_face_eyes(cls, mirror_object):
         obj = shared.new_obj(bmesh.ops.create_uvsphere, name='Eyes',
-            u_segments=16, v_segments=8, diameter=0.25)
+            u_segments=16, v_segments=8, radius=0.25)
         use_smooth(obj.data, True)
         obj.scale.y = 0.25
         obj.location = (0.45, -0.1, 0.2)
@@ -349,7 +349,7 @@ class Owl:
     def new_claws(cls, mirror_object):
         # feet
         base = shared.new_obj(bmesh.ops.create_cone, name='Claws', segments=6,
-            diameter1=0.2, diameter2=0.2, depth=0.15, cap_ends=True)
+            radius1=0.2, radius2=0.2, depth=0.15, cap_ends=True)
         base.rotation_euler.z = math.pi / 2
         obj_apply_transforms(base)
         base.location = (0.0, -0.1, -0.5)

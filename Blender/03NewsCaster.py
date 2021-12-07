@@ -1,6 +1,6 @@
 #!/usr/bin/env -S blender --factory-startup --python
 
-# blender: 2.93
+# blender: 3.0
 # ref: Mega Man Legends News Caster
 
 import sys, math
@@ -63,7 +63,7 @@ class Character:
         bm = bmesh.new()
 
         sphv = bmesh.ops.create_uvsphere(bm, u_segments=6, v_segments=5,
-            diameter=0.5)['verts']
+            radius=0.5)['verts']
         bmesh.ops.scale(bm, verts=sphv, vec=(0.36, 0.37, 0.35))
         bmesh.ops.translate(bm, verts=sphv, vec=(0.0, 0.03, 1.53))
         bmesh.ops.bisect_plane(bm, geom=sphv, dist=0.0000001, plane_co=(0, 0, 0),
@@ -103,8 +103,8 @@ class Character:
     @classmethod
     def nose(cls):
         bm = bmesh.new()
-        conev = bmesh.ops.create_cone(bm, segments=3, diameter1=1.0,
-            diameter2=0.0, depth=1.0)['verts']
+        conev = bmesh.ops.create_cone(bm, segments=3, radius1=1.0,
+            radius2=0.0, depth=1.0)['verts']
         bmesh.ops.rotate(bm, verts=conev, matrix=Rotation(math.radians(90), 3, 'X'))
         bmesh.ops.scale(bm, verts=conev, vec=(0.02, 0.04, 0.04))
         bmesh.ops.translate(bm, verts=conev, vec=(0.0, -0.122, 1.443))
