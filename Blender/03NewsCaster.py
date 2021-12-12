@@ -47,7 +47,7 @@ class Character:
         bm_absorb_obj(bm, cls.head())
         bm_absorb_obj(bm, cls.arms())
         bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
-            merge_dist=0.001, axis='X')
+            merge_dist=0.001, axis='X', mirror_u=True)
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
 
@@ -62,8 +62,9 @@ class Character:
     def head(cls):
         bm = bmesh.new()
 
+        uv_layer = bm.loops.layers.uv.new()
         sphv = bmesh.ops.create_uvsphere(bm, u_segments=6, v_segments=5,
-            radius=0.5)['verts']
+            radius=0.5, calc_uvs=True)['verts']
         bmesh.ops.scale(bm, verts=sphv, vec=(0.36, 0.37, 0.35))
         bmesh.ops.translate(bm, verts=sphv, vec=(0.0, 0.03, 1.53))
         bmesh.ops.bisect_plane(bm, geom=sphv, dist=0.0000001, plane_co=(0, 0, 0),
@@ -94,11 +95,19 @@ class Character:
         pokev[0].co += Vector((-pokev[0].co.x, 0.06, -0.09))
         bmesh.ops.pointmerge(bm, verts=(pokev[0], sphv[2]), merge_co=pokev[0].co)
 
+        # adjust UVs scale and position
+        for face in bm.faces:
+           for loop in face.loops:
+               loop[uv_layer].uv *= 0.9
+               loop[uv_layer].uv.x += 0.35
+
+        # mesh & object
         mesh = bpy.data.meshes.new('head')
         bm.to_mesh(mesh)
         bm.free()
+        object = bpy.data.objects.new(mesh.name, mesh)
 
-        return bpy.data.objects.new(mesh.name, mesh)
+        return object
 
     @classmethod
     def nose(cls):
