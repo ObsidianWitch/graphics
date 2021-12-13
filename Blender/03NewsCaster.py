@@ -9,6 +9,7 @@ from mathutils import Matrix, Vector
 Diagonal = Matrix.Diagonal
 Rotation = Matrix.Rotation
 Translation = Matrix.Translation
+import PIL.Image
 
 if '.' not in sys.path:
     sys.path.append('.')
@@ -55,8 +56,10 @@ class Character:
         bm.to_mesh(self.obj.data)
         bm.free()
 
-        # material
-        self.obj.data.materials.append(cls.material())
+        # texture & material
+        texture = cls.texture()
+        material = cls.material(texture)
+        self.obj.data.materials.append(material)
 
     @classmethod
     def head(cls):
@@ -262,14 +265,31 @@ class Character:
         return bpy.data.objects.new(mesh.name, mesh)
 
     @classmethod
-    def material(cls):
+    def material(cls, texture):
         material = bpy.data.materials.new(name='Material')
         material.use_nodes = True
 
+        # nodes
         nodes = material.node_tree.nodes
+        nodes.new('ShaderNodeTexImage')
+        nodes['Image Texture'].image = texture
+        nodes['Image Texture'].interpolation = 'Closest'
         nodes['Principled BSDF'].inputs['Specular'].default_value = 0.0
 
+        # links
+        links = material.node_tree.links
+        links.new(nodes['Image Texture'].outputs['Color'],
+                  nodes['Principled BSDF'].inputs['Base Color'])
+
         return material
+
+    @classmethod
+    def texture(cls):
+        image = PIL.Image.new(mode='RGB', size=(256, 128), color=(0, 256, 0))
+
+        filepath = '03Texture.png'
+        image.save(filepath)
+        return bpy.data.images.load(filepath, check_existing=True)
 
 def import_from_blend(filepath, type, name):
     bpy.ops.wm.append(filepath  = f"{filepath}/{type}/{name}",
