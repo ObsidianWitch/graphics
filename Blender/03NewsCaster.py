@@ -28,6 +28,8 @@ def bm_absorb_obj(bm, obj):
     bpy.data.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
 
 class Character:
+    # side effects: bpy.data.meshes, bpy.data.objects, bpy.data.materials,
+    #   03Texture.png, bpy.data.images
     def __init__(self, name='Character'):
         cls = self.__class__
 
@@ -61,8 +63,9 @@ class Character:
         material = cls.material(texture)
         self.obj.data.materials.append(material)
 
+    # side effects: bpy.data.meshes, bpy.data.objects
     @classmethod
-    def head(cls):
+    def head(cls) -> bpy.types.Object:
         bm = bmesh.new()
 
         uv_layer = bm.loops.layers.uv.new()
@@ -102,7 +105,7 @@ class Character:
         for face in bm.faces:
            for loop in face.loops:
                loop[uv_layer].uv *= 0.9
-               loop[uv_layer].uv.x += 0.35
+               loop[uv_layer].uv += Vector((0.35, 0.05))
 
         # mesh & object
         mesh = bpy.data.meshes.new('head')
@@ -112,8 +115,9 @@ class Character:
 
         return object
 
+    # side effects: bpy.data.meshes, bpy.data.objects
     @classmethod
-    def nose(cls):
+    def nose(cls) -> bpy.types.Object:
         bm = bmesh.new()
         conev = bmesh.ops.create_cone(bm, segments=3, radius1=1.0,
             radius2=0.0, depth=1.0)['verts']
@@ -128,8 +132,9 @@ class Character:
 
         return bpy.data.objects.new(mesh.name, mesh)
 
+    # side effects: bpy.data.meshes, bpy.data.objects
     @classmethod
-    def neck(cls):
+    def neck(cls) -> bpy.types.Object:
         bm = bmesh.new()
 
         lneck1 = create_plane(bm, fill=False)
@@ -148,8 +153,9 @@ class Character:
 
         return bpy.data.objects.new(mesh.name, mesh)
 
+    # side effects: bpy.data.meshes, bpy.data.objects
     @classmethod
-    def torso(cls):
+    def torso(cls) -> bpy.types.Object:
         bm = bmesh.new()
 
         luppertop = create_plane(bm, fill=True)
@@ -178,8 +184,9 @@ class Character:
 
         return bpy.data.objects.new(mesh.name, mesh)
 
+    # side effects: bpy.data.meshes, bpy.data.objects
     @classmethod
-    def arms(cls):
+    def arms(cls) -> bpy.types.Object:
         bm = bmesh.new()
 
         l1 = create_plane(bm, fill=True)
@@ -232,8 +239,9 @@ class Character:
 
         return bpy.data.objects.new(mesh.name, mesh)
 
+    # side effects: bpy.data.meshes, bpy.data.objects
     @classmethod
-    def legs(cls):
+    def legs(cls) -> bpy.types.Object:
         bm = bmesh.new()
         ltop = create_plane(bm, fill=False)
         bmesh.ops.scale(bm, verts=ltop['verts'], vec=(0.16, 0.16, 1.0))
@@ -264,8 +272,9 @@ class Character:
 
         return bpy.data.objects.new(mesh.name, mesh)
 
+    # side effects: bpy.data.materials
     @classmethod
-    def material(cls, texture):
+    def material(cls, texture) -> bpy.types.Material:
         material = bpy.data.materials.new(name='Material')
         material.use_nodes = True
 
@@ -283,8 +292,9 @@ class Character:
 
         return material
 
+    # side effects: 03Texture.png, bpy.data.images
     @classmethod
-    def texture(cls):
+    def texture(cls) -> bpy.types.Image:
         image = PIL.Image.new(mode='RGB', size=(256, 128), color=(0, 256, 0))
 
         filepath = '03Texture.png'
