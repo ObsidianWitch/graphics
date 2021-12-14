@@ -27,9 +27,22 @@ def bm_absorb_obj(bm, obj):
     bm.from_mesh(obj.data)
     bpy.data.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
 
+# side effects: bpy.context
+def smart_project(object):
+    scene = bpy.context.scene
+    scene.collection.objects.link(object)
+
+    bpy.context.view_layer.objects.active = object
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.smart_project(island_margin=0.01, correct_aspect=True,
+        scale_to_bounds=True)
+
+    scene.collection.objects.unlink(object)
+
 class Character:
     # side effects: bpy.data.meshes, bpy.data.objects, bpy.data.materials,
-    #   03Texture.png, bpy.data.images
+    #   03Texture.png, bpy.data.images, bpy.context
     def __init__(self, name='Character'):
         cls = self.__class__
 
@@ -50,7 +63,7 @@ class Character:
         bm_absorb_obj(bm, cls.head())
         bm_absorb_obj(bm, cls.arms())
         bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
-            merge_dist=0.001, axis='X', mirror_u=True)
+            merge_dist=0.001, axis='X')
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
 
@@ -58,19 +71,18 @@ class Character:
         bm.to_mesh(self.obj.data)
         bm.free()
 
-        # texture & material
+        # UVs, texture & material
         texture = cls.texture()
         material = cls.material(texture)
         self.obj.data.materials.append(material)
+        smart_project(self.obj) # unwrap after setting texture to get correct aspect
 
     # side effects: bpy.data.meshes, bpy.data.objects
     @classmethod
     def head(cls) -> bpy.types.Object:
         bm = bmesh.new()
 
-        uv_layer = bm.loops.layers.uv.new()
-        sphv = bmesh.ops.create_uvsphere(bm, u_segments=6, v_segments=5,
-            radius=0.5, calc_uvs=True)['verts']
+        sphv = bmesh.ops.create_uvsphere(bm, u_segments=6, v_segments=5, radius=0.5)['verts']
         bmesh.ops.scale(bm, verts=sphv, vec=(0.36, 0.37, 0.35))
         bmesh.ops.translate(bm, verts=sphv, vec=(0.0, 0.03, 1.53))
         bmesh.ops.bisect_plane(bm, geom=sphv, dist=0.0000001, plane_co=(0, 0, 0),
@@ -100,12 +112,6 @@ class Character:
         pokev = bmesh.ops.poke(bm, faces=sphv[2].link_faces[0:1])['verts']
         pokev[0].co += Vector((-pokev[0].co.x, 0.06, -0.09))
         bmesh.ops.pointmerge(bm, verts=(pokev[0], sphv[2]), merge_co=pokev[0].co)
-
-        # adjust UVs scale and position
-        for face in bm.faces:
-           for loop in face.loops:
-               loop[uv_layer].uv *= 0.9
-               loop[uv_layer].uv += Vector((0.35, 0.05))
 
         # mesh & object
         mesh = bpy.data.meshes.new('head')
