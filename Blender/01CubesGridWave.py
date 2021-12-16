@@ -6,14 +6,14 @@
 # ref: [BPY Documentation](https://docs.blender.org/api/current/)
 # ref: [Python Performance with Blender operators](https://blender.stackexchange.com/a/7360)
 
-import sys, itertools, math
+import sys, itertools, math, importlib
 import bpy, bmesh, mathutils
 
+# ref: https://docs.blender.org/api/current/info_tips_and_tricks.html#executing-modules
 if '.' not in sys.path:
     sys.path.append('.')
-if 'shared' in sys.modules:
-    del sys.modules['shared']
 import shared
+importlib.reload(shared)
 
 # Create a template cube.
 def new_cube():

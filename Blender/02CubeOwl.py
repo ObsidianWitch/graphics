@@ -4,16 +4,15 @@
 # blender: 3.0
 # ref: https://cloud.blender.org/training/primitive-animals/
 
-import sys, math
+import sys, math, importlib
 import bpy, bmesh
 from mathutils import Matrix, Vector
 import numpy as np
 
 if '.' not in sys.path:
     sys.path.append('.')
-if 'shared' in sys.modules:
-    del sys.modules['shared']
 import shared
+importlib.reload(shared)
 
 def use_smooth(mesh, value):
     for p in mesh.polygons:

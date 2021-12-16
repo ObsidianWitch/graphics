@@ -3,19 +3,18 @@
 # blender: 3.0
 # ref: Mega Man Legends News Caster
 
-import sys, math
+import sys, math, importlib
 import bpy, bmesh
 from mathutils import Matrix, Vector
 Diagonal = Matrix.Diagonal
 Rotation = Matrix.Rotation
 Translation = Matrix.Translation
-import PIL.Image
+import PIL.Image # https://pypi.org/project/Pillow/
 
 if '.' not in sys.path:
     sys.path.append('.')
-if 'shared' in sys.modules:
-    del sys.modules['shared']
 import shared
+importlib.reload(shared)
 
 def create_plane(bm, fill):
     result = bmesh.ops.create_grid(bm, x_segments=0, y_segments=0, size=0.5)
