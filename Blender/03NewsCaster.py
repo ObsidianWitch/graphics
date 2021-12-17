@@ -5,6 +5,8 @@
 
 import sys, math, importlib
 import bpy, bmesh
+C = bpy.context
+D = bpy.data
 from mathutils import Matrix, Vector
 Diagonal = Matrix.Diagonal
 Rotation = Matrix.Rotation
@@ -24,11 +26,10 @@ def create_plane(bm, fill):
 
 def bm_absorb_obj(bm, obj):
     bm.from_mesh(obj.data)
-    bpy.data.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
+    D.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
 
 class Character:
-    # side effects: bpy.data.meshes, bpy.data.objects, bpy.data.materials,
-    #   03Texture.png, bpy.data.images, bpy.context
+    # side effects: D.meshes, D.objects, D.materials, 03Texture.png, D.images
     @classmethod
     def object(cls, name='Character'):
         # mesh & object
@@ -52,18 +53,18 @@ class Character:
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
 
-        object = bpy.data.objects.new(name, bpy.data.meshes.new(name))
+        object = D.objects.new(name, D.meshes.new(name))
         bm.to_mesh(object.data)
         bm.free()
 
-        # UVs, texture & material
+        # texture & material
         texture = cls.texture()
         material = cls.material(texture)
         object.data.materials.append(material)
 
         return object
 
-    # side effects: bpy.data.meshes, bpy.data.objects
+    # side effects: D.meshes, D.objects
     @classmethod
     def head(cls) -> bpy.types.Object:
         bm = bmesh.new()
@@ -113,14 +114,14 @@ class Character:
                 loop[uv_layer].uv.x += 0.5 + 0.1
 
         # mesh & object
-        mesh = bpy.data.meshes.new('head')
+        mesh = D.meshes.new('head')
         bm.to_mesh(mesh)
         bm.free()
-        object = bpy.data.objects.new(mesh.name, mesh)
+        object = D.objects.new(mesh.name, mesh)
 
         return object
 
-    # side effects: bpy.data.meshes, bpy.data.objects
+    # side effects: D.meshes, D.objects
     @classmethod
     def nose(cls) -> bpy.types.Object:
         bm = bmesh.new()
@@ -131,13 +132,13 @@ class Character:
         bmesh.ops.translate(bm, verts=conev, vec=(0.0, -0.122, 1.443))
         conev[0].co.y -= 0.01
 
-        mesh = bpy.data.meshes.new('nose')
+        mesh = D.meshes.new('nose')
         bm.to_mesh(mesh)
         bm.free()
 
-        return bpy.data.objects.new(mesh.name, mesh)
+        return D.objects.new(mesh.name, mesh)
 
-    # side effects: bpy.data.meshes, bpy.data.objects
+    # side effects: D.meshes, D.objects
     @classmethod
     def neck(cls) -> bpy.types.Object:
         bm = bmesh.new()
@@ -152,13 +153,13 @@ class Character:
 
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
-        mesh = bpy.data.meshes.new('neck')
+        mesh = D.meshes.new('neck')
         bm.to_mesh(mesh)
         bm.free()
 
-        return bpy.data.objects.new(mesh.name, mesh)
+        return D.objects.new(mesh.name, mesh)
 
-    # side effects: bpy.data.meshes, bpy.data.objects
+    # side effects: D.meshes, D.objects
     @classmethod
     def torso(cls) -> bpy.types.Object:
         bm = bmesh.new()
@@ -183,13 +184,13 @@ class Character:
         bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
             dist=0.0000001, plane_co=(0, 0, 0), plane_no=(1, 0, 0), clear_inner=True)
 
-        mesh = bpy.data.meshes.new('torso')
+        mesh = D.meshes.new('torso')
         bm.to_mesh(mesh)
         bm.free()
 
-        return bpy.data.objects.new(mesh.name, mesh)
+        return D.objects.new(mesh.name, mesh)
 
-    # side effects: bpy.data.meshes, bpy.data.objects
+    # side effects: D.meshes, D.objects
     @classmethod
     def arms(cls) -> bpy.types.Object:
         bm = bmesh.new()
@@ -238,13 +239,13 @@ class Character:
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
-        mesh = bpy.data.meshes.new('arms')
+        mesh = D.meshes.new('arms')
         bm.to_mesh(mesh)
         bm.free()
 
-        return bpy.data.objects.new(mesh.name, mesh)
+        return D.objects.new(mesh.name, mesh)
 
-    # side effects: bpy.data.meshes, bpy.data.objects
+    # side effects: D.meshes, D.objects
     @classmethod
     def legs(cls) -> bpy.types.Object:
         bm = bmesh.new()
@@ -271,16 +272,16 @@ class Character:
 
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
 
-        mesh = bpy.data.meshes.new('legs')
+        mesh = D.meshes.new('legs')
         bm.to_mesh(mesh)
         bm.free()
 
-        return bpy.data.objects.new(mesh.name, mesh)
+        return D.objects.new(mesh.name, mesh)
 
-    # side effects: bpy.data.materials
+    # side effects: D.materials
     @classmethod
     def material(cls, texture) -> bpy.types.Material:
-        material = bpy.data.materials.new(name='Material')
+        material = D.materials.new(name='Material')
         material.use_nodes = True
 
         # nodes
@@ -297,14 +298,14 @@ class Character:
 
         return material
 
-    # side effects: 03Texture.png, bpy.data.images
+    # side effects: 03Texture.png, D.images
     @classmethod
     def texture(cls) -> bpy.types.Image:
         image = PIL.Image.new(mode='RGB', size=(256, 256), color=(0, 256, 0))
 
         filepath = '03Texture.png'
         image.save(filepath)
-        return bpy.data.images.load(filepath, check_existing=True)
+        return D.images.load(filepath, check_existing=True)
 
 def import_from_blend(filepath, type, name):
     bpy.ops.wm.append(filepath  = f"{filepath}/{type}/{name}",
@@ -313,14 +314,14 @@ def import_from_blend(filepath, type, name):
 
 def setup_reference():
     import_from_blend('03Reference.blend', 'Collection', 'References')
-    references = bpy.data.collections['References'].objects
+    references = D.collections['References'].objects
     for obj in references:
         obj.hide_viewport = False
         obj.show_in_front = True
         obj.display_type = 'WIRE'
 
 def setup_scene():
-    scene = bpy.data.scenes[0]
+    scene = D.scenes[0]
     scene.collection.objects.link(Character.object())
 
 if __name__ == '__main__':
