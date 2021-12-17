@@ -26,25 +26,11 @@ def bm_absorb_obj(bm, obj):
     bm.from_mesh(obj.data)
     bpy.data.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
 
-# side effects: bpy.context
-def smart_project(object):
-    scene = bpy.context.scene
-    scene.collection.objects.link(object)
-
-    bpy.context.view_layer.objects.active = object
-    bpy.ops.object.mode_set(mode='EDIT')
-    bpy.ops.mesh.select_all(action='SELECT')
-    bpy.ops.uv.smart_project(island_margin=0.01, correct_aspect=True,
-        scale_to_bounds=True)
-
-    scene.collection.objects.unlink(object)
-
 class Character:
     # side effects: bpy.data.meshes, bpy.data.objects, bpy.data.materials,
     #   03Texture.png, bpy.data.images, bpy.context
-    def __init__(self, name='Character'):
-        cls = self.__class__
-
+    @classmethod
+    def object(cls, name='Character'):
         # mesh & object
         bm = bmesh.new()
 
@@ -62,26 +48,29 @@ class Character:
         bm_absorb_obj(bm, cls.head())
         bm_absorb_obj(bm, cls.arms())
         bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
-            merge_dist=0.001, axis='X')
+            merge_dist=0.001, axis='X', mirror_u=True)
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
 
-        self.obj = bpy.data.objects.new(name, bpy.data.meshes.new(name))
-        bm.to_mesh(self.obj.data)
+        object = bpy.data.objects.new(name, bpy.data.meshes.new(name))
+        bm.to_mesh(object.data)
         bm.free()
 
         # UVs, texture & material
         texture = cls.texture()
         material = cls.material(texture)
-        self.obj.data.materials.append(material)
-        smart_project(self.obj) # unwrap after setting texture to get correct aspect
+        object.data.materials.append(material)
+
+        return object
 
     # side effects: bpy.data.meshes, bpy.data.objects
     @classmethod
     def head(cls) -> bpy.types.Object:
         bm = bmesh.new()
 
-        sphv = bmesh.ops.create_uvsphere(bm, u_segments=6, v_segments=5, radius=0.5)['verts']
+        uv_layer = bm.loops.layers.uv.new()
+        sphv = bmesh.ops.create_uvsphere(bm, u_segments=6, v_segments=5,
+                                         radius=0.5)['verts']
         bmesh.ops.scale(bm, verts=sphv, vec=(0.36, 0.37, 0.35))
         bmesh.ops.translate(bm, verts=sphv, vec=(0.0, 0.03, 1.53))
         bmesh.ops.bisect_plane(bm, geom=sphv, dist=0.0000001, plane_co=(0, 0, 0),
@@ -111,6 +100,17 @@ class Character:
         pokev = bmesh.ops.poke(bm, faces=sphv[2].link_faces[0:1])['verts']
         pokev[0].co += Vector((-pokev[0].co.x, 0.06, -0.09))
         bmesh.ops.pointmerge(bm, verts=(pokev[0], sphv[2]), merge_co=pokev[0].co)
+
+        # UVs
+        front_verts = bm.verts[6:14] + bm.verts[15:16]
+        for vert in front_verts:
+            for loop in vert.link_loops:
+                loop[uv_layer].uv = loop.vert.co.xz
+                loop[uv_layer].uv.x += 0.5
+        for vert in set(bm.verts) - set(front_verts):
+            for loop in vert.link_loops:
+                loop[uv_layer].uv = loop.vert.co.yz
+                loop[uv_layer].uv.x += 0.5 + 0.1
 
         # mesh & object
         mesh = bpy.data.meshes.new('head')
@@ -300,7 +300,7 @@ class Character:
     # side effects: 03Texture.png, bpy.data.images
     @classmethod
     def texture(cls) -> bpy.types.Image:
-        image = PIL.Image.new(mode='RGB', size=(256, 128), color=(0, 256, 0))
+        image = PIL.Image.new(mode='RGB', size=(256, 256), color=(0, 256, 0))
 
         filepath = '03Texture.png'
         image.save(filepath)
@@ -321,7 +321,7 @@ def setup_reference():
 
 def setup_scene():
     scene = bpy.data.scenes[0]
-    scene.collection.objects.link(Character().obj)
+    scene.collection.objects.link(Character.object())
 
 if __name__ == '__main__':
     shared.delete_data()
