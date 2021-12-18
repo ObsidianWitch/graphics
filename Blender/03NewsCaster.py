@@ -124,7 +124,9 @@ class Character:
     # side effects: D.meshes, D.objects
     @classmethod
     def nose(cls) -> bpy.types.Object:
+        # bmesh
         bm = bmesh.new()
+        uv_layer = bm.loops.layers.uv.new()
         conev = bmesh.ops.create_cone(bm, segments=3, radius1=1.0,
             radius2=0.0, depth=1.0)['verts']
         bmesh.ops.rotate(bm, verts=conev, matrix=Rotation(math.radians(90), 3, 'X'))
@@ -132,10 +134,17 @@ class Character:
         bmesh.ops.translate(bm, verts=conev, vec=(0.0, -0.122, 1.443))
         conev[0].co.y -= 0.01
 
+        # UVs
+        bm.verts.ensure_lookup_table()
+        for vert in bm.verts:
+            for loop in vert.link_loops:
+                loop[uv_layer].uv = bm.verts[3].co.xz
+                loop[uv_layer].uv.x += 0.5
+
+        # mesh & object
         mesh = D.meshes.new('nose')
         bm.to_mesh(mesh)
         bm.free()
-
         return D.objects.new(mesh.name, mesh)
 
     # side effects: D.meshes, D.objects
@@ -321,8 +330,7 @@ def setup_reference():
         obj.display_type = 'WIRE'
 
 def setup_scene():
-    scene = D.scenes[0]
-    scene.collection.objects.link(Character.object())
+    D.scenes[0].collection.objects.link(Character.object())
 
 if __name__ == '__main__':
     shared.delete_data()
