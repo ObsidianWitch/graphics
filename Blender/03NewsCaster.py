@@ -150,22 +150,28 @@ class Character:
     # side effects: D.meshes, D.objects
     @classmethod
     def neck(cls) -> bpy.types.Object:
+        # bmesh
         bm = bmesh.new()
-
-        lneck1 = create_plane(bm, fill=False)
-        bmesh.ops.scale(bm, verts=lneck1['verts'], vec=(0.07, 0.06, 1.0))
-        bmesh.ops.scale(bm, verts=lneck1['verts'][2:], vec=(0.0, 1.07, 1.0))
-        bmesh.ops.translate(bm, verts=lneck1['verts'], vec=(0.0, 0.02, 1.35))
-
+        uv_layer = bm.loops.layers.uv.new()
+        l1 = create_plane(bm, fill=False)
+        bmesh.ops.scale(bm, verts=l1['verts'], vec=(0.07, 0.06, 1.0))
+        bmesh.ops.scale(bm, verts=l1['verts'][2:], vec=(0.0, 1.07, 1.0))
+        bmesh.ops.translate(bm, verts=l1['verts'], vec=(0.0, 0.02, 1.35))
         bmesh.ops.extrude_edge_only(bm, edges=bm.edges)
         bmesh.ops.translate(bm, verts=bm.verts[-4:], vec=(0.0, 0.0, 0.07))
-
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
+        # UVs
+        bm.verts.ensure_lookup_table()
+        for vert in bm.verts:
+            for loop in vert.link_loops:
+                loop[uv_layer].uv = bm.verts[5].co.xz
+                loop[uv_layer].uv.x += 0.5
+
+        # mesh & object
         mesh = D.meshes.new('neck')
         bm.to_mesh(mesh)
         bm.free()
-
         return D.objects.new(mesh.name, mesh)
 
     # side effects: D.meshes, D.objects
