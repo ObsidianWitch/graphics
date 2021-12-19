@@ -29,7 +29,6 @@ def bm_absorb_obj(bm, obj):
     D.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
 
 class Character:
-    # side effects: D.meshes, D.objects, D.materials, 03Texture.png, D.images
     @classmethod
     def object(cls, name='Character'):
         # mesh & object
@@ -64,7 +63,6 @@ class Character:
 
         return object
 
-    # side effects: D.meshes, D.objects
     @classmethod
     def head(cls) -> bpy.types.Object:
         bm = bmesh.new()
@@ -104,13 +102,14 @@ class Character:
 
         # UVs
         front_verts = bm.verts[6:14] + bm.verts[15:16]
+        remaining_verts = set(bm.verts) - set(front_verts)
         for vert in front_verts:
             for loop in vert.link_loops:
-                loop[uv_layer].uv = loop.vert.co.xz
+                loop[uv_layer].uv = vert.co.xz
                 loop[uv_layer].uv.x += 0.5
-        for vert in set(bm.verts) - set(front_verts):
+        for vert in remaining_verts:
             for loop in vert.link_loops:
-                loop[uv_layer].uv = loop.vert.co.yz
+                loop[uv_layer].uv = vert.co.yz
                 loop[uv_layer].uv.x += 0.5 + 0.1
 
         # mesh & object
@@ -121,7 +120,6 @@ class Character:
 
         return object
 
-    # side effects: D.meshes, D.objects
     @classmethod
     def nose(cls) -> bpy.types.Object:
         # bmesh
@@ -147,7 +145,6 @@ class Character:
         bm.free()
         return D.objects.new(mesh.name, mesh)
 
-    # side effects: D.meshes, D.objects
     @classmethod
     def neck(cls) -> bpy.types.Object:
         # bmesh
@@ -174,10 +171,10 @@ class Character:
         bm.free()
         return D.objects.new(mesh.name, mesh)
 
-    # side effects: D.meshes, D.objects
     @classmethod
     def torso(cls) -> bpy.types.Object:
         bm = bmesh.new()
+        uv_layer = bm.loops.layers.uv.new()
 
         luppertop = create_plane(bm, fill=True)
         bmesh.ops.scale(bm, verts=luppertop['verts'], vec=(0.14, 0.1, 1.0))
@@ -199,13 +196,34 @@ class Character:
         bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
             dist=0.0000001, plane_co=(0, 0, 0), plane_no=(1, 0, 0), clear_inner=True)
 
+        # note: faces loops produce split UVs, verts link_loops produce stitched UVs
+        faces = bm.faces[:]
+        for loop in faces[0].loops: # top
+            loop[uv_layer].uv = loop.vert.co.xy
+            loop[uv_layer].uv.y += loop.vert.co.z
+            loop[uv_layer].uv.y += 0.05
+        for face in faces[1:6:2]: # front
+            for loop in face.loops:
+                loop[uv_layer].uv = loop.vert.co.xz
+        for face in faces[2:7:2]: # side
+            for loop in face.loops:
+                loop[uv_layer].uv = loop.vert.co.yz
+                loop[uv_layer].uv.x += 0.25
+        for face in faces[7:10]: # back
+            for loop in face.loops:
+                loop[uv_layer].uv = loop.vert.co.xz
+                loop[uv_layer].uv.x *= -1
+                loop[uv_layer].uv.x += 0.5
+        for face in faces:
+            for loop in face.loops:
+                loop[uv_layer].uv += Vector((0.5, -0.11))
+
+        # mesh & object
         mesh = D.meshes.new('torso')
         bm.to_mesh(mesh)
         bm.free()
-
         return D.objects.new(mesh.name, mesh)
 
-    # side effects: D.meshes, D.objects
     @classmethod
     def arms(cls) -> bpy.types.Object:
         bm = bmesh.new()
@@ -260,7 +278,6 @@ class Character:
 
         return D.objects.new(mesh.name, mesh)
 
-    # side effects: D.meshes, D.objects
     @classmethod
     def legs(cls) -> bpy.types.Object:
         bm = bmesh.new()
@@ -293,7 +310,6 @@ class Character:
 
         return D.objects.new(mesh.name, mesh)
 
-    # side effects: D.materials
     @classmethod
     def material(cls, texture) -> bpy.types.Material:
         material = D.materials.new(name='Material')
@@ -313,7 +329,6 @@ class Character:
 
         return material
 
-    # side effects: 03Texture.png, D.images
     @classmethod
     def texture(cls) -> bpy.types.Image:
         image = PIL.Image.new(mode='RGB', size=(256, 256), color=(0, 256, 0))
