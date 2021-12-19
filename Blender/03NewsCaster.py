@@ -33,20 +33,9 @@ class Character:
     def object(cls, name='Character'):
         # mesh & object
         bm = bmesh.new()
-
-        ## create pelvis from torso and legs
-        bm_absorb_obj(bm, cls.torso())
-        bm_absorb_obj(bm, cls.legs())
-        bmesh.ops.bridge_loops(bm, edges=bm.edges[6:8] + bm.edges[17:18] + bm.edges[25:29])
-        bmesh.ops.subdivide_edges(bm, edges=bm.edges[55:57], cuts=1)
-        bm.verts.ensure_lookup_table()
-        bm.verts[32].co = bm.verts[19].co
-        bm.verts[33].co.y = bm.verts[19].co.y
-        bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=0.0001)
-
-        ## add remaining parts
         bm_absorb_obj(bm, cls.head())
         bm_absorb_obj(bm, cls.arms())
+        bm_absorb_obj(bm, cls.pelvis())
         bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
             merge_dist=0.001, axis='X', mirror_u=True)
         bm_absorb_obj(bm, cls.nose())
@@ -307,8 +296,26 @@ class Character:
         mesh = D.meshes.new('legs')
         bm.to_mesh(mesh)
         bm.free()
-
         return D.objects.new(mesh.name, mesh)
+
+    @classmethod
+    def pelvis(cls) -> bpy.types.Object:
+        # create pelvis from torso and legs
+        bm = bmesh.new()
+        bm_absorb_obj(bm, cls.torso())
+        bm_absorb_obj(bm, cls.legs())
+        bmesh.ops.bridge_loops(bm, edges=bm.edges[6:8] + bm.edges[17:18] + bm.edges[25:29])
+        bmesh.ops.subdivide_edges(bm, edges=bm.edges[55:57], cuts=1)
+        bm.verts.ensure_lookup_table()
+        bm.verts[32].co = bm.verts[19].co
+        bm.verts[33].co.y = bm.verts[19].co.y
+        bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=0.0001)
+
+        mesh = D.meshes.new('torso_pelvis_legs')
+        bm.to_mesh(mesh)
+        bm.free()
+        return D.objects.new(mesh.name, mesh)
+
 
     @classmethod
     def material(cls, texture) -> bpy.types.Material:
