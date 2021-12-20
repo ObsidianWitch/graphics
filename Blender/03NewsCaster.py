@@ -30,7 +30,7 @@ def bm_absorb_obj(bm, obj):
 
 class Character:
     @classmethod
-    def object(cls, name='Character'):
+    def object(cls):
         # mesh & object
         bm = bmesh.new()
         bm_absorb_obj(bm, cls.head())
@@ -41,9 +41,10 @@ class Character:
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
 
-        object = D.objects.new(name, D.meshes.new(name))
-        bm.to_mesh(object.data)
+        mesh = D.meshes.new('character')
+        bm.to_mesh(mesh)
         bm.free()
+        object = D.objects.new(mesh.name, mesh)
 
         # texture & material
         texture = cls.texture()
@@ -90,16 +91,7 @@ class Character:
         bmesh.ops.pointmerge(bm, verts=(pokev[0], sphv[2]), merge_co=pokev[0].co)
 
         # UVs
-        front_verts = bm.verts[6:14] + bm.verts[15:16]
-        remaining_verts = set(bm.verts) - set(front_verts)
-        for vert in front_verts:
-            for loop in vert.link_loops:
-                loop[uv_layer].uv = vert.co.xz
-                loop[uv_layer].uv.x += 0.5
-        for vert in remaining_verts:
-            for loop in vert.link_loops:
-                loop[uv_layer].uv = vert.co.yz
-                loop[uv_layer].uv.x += 0.5 + 0.1
+        shared.uv_cube_project(bm)
 
         # mesh & object
         mesh = D.meshes.new('head')
@@ -185,27 +177,7 @@ class Character:
         bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
             dist=0.0000001, plane_co=(0, 0, 0), plane_no=(1, 0, 0), clear_inner=True)
 
-        # note: faces loops produce split UVs, verts link_loops produce stitched UVs
-        faces = bm.faces[:]
-        for loop in faces[0].loops: # top
-            loop[uv_layer].uv = loop.vert.co.xy
-            loop[uv_layer].uv.y += loop.vert.co.z
-            loop[uv_layer].uv.y += 0.05
-        for face in faces[1:6:2]: # front
-            for loop in face.loops:
-                loop[uv_layer].uv = loop.vert.co.xz
-        for face in faces[2:7:2]: # side
-            for loop in face.loops:
-                loop[uv_layer].uv = loop.vert.co.yz
-                loop[uv_layer].uv.x += 0.25
-        for face in faces[7:10]: # back
-            for loop in face.loops:
-                loop[uv_layer].uv = loop.vert.co.xz
-                loop[uv_layer].uv.x *= -1
-                loop[uv_layer].uv.x += 0.5
-        for face in faces:
-            for loop in face.loops:
-                loop[uv_layer].uv += Vector((0.5, -0.11))
+        shared.uv_cube_project(bm)
 
         # mesh & object
         mesh = D.meshes.new('torso')
@@ -316,10 +288,9 @@ class Character:
         bm.free()
         return D.objects.new(mesh.name, mesh)
 
-
     @classmethod
     def material(cls, texture) -> bpy.types.Material:
-        material = D.materials.new(name='Material')
+        material = D.materials.new(name='material')
         material.use_nodes = True
 
         # nodes
@@ -358,7 +329,7 @@ def setup_reference():
         obj.display_type = 'WIRE'
 
 def setup_scene():
-    D.scenes[0].collection.objects.link(Character.object())
+    D.scenes[0].collection.objects.link(Character.torso())
 
 if __name__ == '__main__':
     shared.delete_data()
