@@ -35,8 +35,8 @@ class UVIsland:
                       'h': top - bottom, 'w': right - left }
         return self.bbox
 
-def uv_cube_project(bm, center=True, margin=0.01):
-    uv_layer = bm.loops.layers.uv[0]
+# Unwrap UVs using cube projection.
+def uv_cube_project(bm, uv_layer):
     islands = { 'top':   UVIsland(), 'bottom': UVIsland(),
                 'front': UVIsland(), 'back':   UVIsland(),
                 'right': UVIsland(), 'left':   UVIsland() }
@@ -61,10 +61,14 @@ def uv_cube_project(bm, center=True, margin=0.01):
             loop[uv_layer].uv.x = loop.vert.co[i]
             loop[uv_layer].uv.y = loop.vert.co[j]
 
-    # position islands
+    # islands' bounding boxes
     for island in islands.values():
         island.calc_bbox(uv_layer)
 
+    return islands
+
+# Position islands resulting from cube projection.
+def uv_cube_position(islands, uv_layer, center=True, margin=0.01):
     def helper(key):
         for face in islands[key].faces:
             for loop in face.loops:
@@ -94,5 +98,3 @@ def uv_cube_project(bm, center=True, margin=0.01):
         offset.x += islands['back'].bbox['w'] + margin
 
     helper('left')
-
-    return islands

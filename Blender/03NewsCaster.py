@@ -91,7 +91,8 @@ class Character:
         bmesh.ops.pointmerge(bm, verts=(pokev[0], sphv[2]), merge_co=pokev[0].co)
 
         # UVs
-        shared.uv_cube_project(bm)
+        islands = shared.uv_cube_project(bm, uv_layer)
+        shared.uv_cube_position(islands, uv_layer)
 
         # mesh & object
         mesh = D.meshes.new('head')
@@ -177,7 +178,8 @@ class Character:
         bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
             dist=0.0000001, plane_co=(0, 0, 0), plane_no=(1, 0, 0), clear_inner=True)
 
-        shared.uv_cube_project(bm)
+        islands = shared.uv_cube_project(bm, uv_layer)
+        shared.uv_cube_position(islands, uv_layer)
 
         # mesh & object
         mesh = D.meshes.new('torso')
