@@ -67,34 +67,25 @@ def uv_cube_project(bm, uv_layer):
 
     return islands
 
-# Position islands resulting from cube projection.
+# Position islands resulting from a cube projection.
 def uv_cube_position(islands, uv_layer, center=True, margin=0.01):
-    def helper(key):
+    def helper(key, offset, contrib_offset):
         for face in islands[key].faces:
             for loop in face.loops:
                 loop[uv_layer].uv.x += offset.x - islands[key].bbox['l']
                 loop[uv_layer].uv.y += offset.y - islands[key].bbox['b']
+        if islands[key].faces:
+            offset.x += contrib_offset[0] * (islands[key].bbox['w'] + margin)
+            offset.y += contrib_offset[1] * (islands[key].bbox['h'] + margin)
 
     offset = Vector((0.5 if center else 0.0, 0.0))
-    helper('front')
-    if islands['front'].faces:
-        offset.y += islands['front'].bbox['h'] + margin
-
-    helper('top')
-    if islands['top'].faces:
-        offset.y += islands['top'].bbox['h'] + margin
-
-    helper('bottom')
+    helper('front', offset, contrib_offset=(0, 1))
+    helper('top', offset, contrib_offset=(0, 1))
+    helper('bottom', offset, contrib_offset=(0, 0))
     offset.y = 0
     if islands['front'].faces:
         offset.x += islands['front'].bbox['w'] + margin
 
-    helper('right')
-    if islands['right'].faces:
-        offset.x += islands['right'].bbox['w'] + margin
-
-    helper('back')
-    if islands['back'].faces:
-        offset.x += islands['back'].bbox['w'] + margin
-
-    helper('left')
+    helper('right', offset, contrib_offset=(1, 0))
+    helper('back', offset, contrib_offset=(1, 0))
+    helper('left', offset, contrib_offset=(0, 0))
