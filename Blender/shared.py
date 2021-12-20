@@ -35,7 +35,7 @@ class UVIsland:
                       'h': top - bottom, 'w': right - left }
         return self.bbox
 
-def uv_cube_project(bm, margin=0.01):
+def uv_cube_project(bm, center=True, margin=0.01):
     uv_layer = bm.loops.layers.uv[0]
     islands = { 'top':   UVIsland(), 'bottom': UVIsland(),
                 'front': UVIsland(), 'back':   UVIsland(),
@@ -71,7 +71,7 @@ def uv_cube_project(bm, margin=0.01):
                 loop[uv_layer].uv.x += offset.x - islands[key].bbox['l']
                 loop[uv_layer].uv.y += offset.y - islands[key].bbox['b']
 
-    offset = Vector((0.0, 0.0))
+    offset = Vector((0.5 if center else 0.0, 0.0))
     helper('front')
     if islands['front'].faces:
         offset.y += islands['front'].bbox['h'] + margin
