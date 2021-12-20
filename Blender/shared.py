@@ -65,49 +65,34 @@ def uv_cube_project(bm, margin=0.01):
     for island in islands.values():
         island.calc_bbox(uv_layer)
 
-    for face in islands['front'].faces:
-        for loop in face.loops:
-            loop[uv_layer].uv.y -= islands['front'].bbox['b']
+    def helper(key):
+        for face in islands[key].faces:
+            for loop in face.loops:
+                loop[uv_layer].uv.x += offset.x - islands[key].bbox['l']
+                loop[uv_layer].uv.y += offset.y - islands[key].bbox['b']
 
-    for face in islands['top'].faces:
-        for loop in face.loops:
-            if islands['front'].faces:
-                loop[uv_layer].uv.y += islands['front'].bbox['h'] + margin
-            loop[uv_layer].uv.y -= islands['top'].bbox['b']
+    offset = Vector((0.0, 0.0))
+    helper('front')
+    if islands['front'].faces:
+        offset.y += islands['front'].bbox['h'] + margin
 
-    for face in islands['bottom'].faces:
-        for loop in face.loops:
-            if islands['front'].faces:
-                loop[uv_layer].uv.y += islands['front'].bbox['h'] + margin
-            if islands['top'].faces:
-                loop[uv_layer].uv.y += islands['top'].bbox['h'] + margin
-            loop[uv_layer].uv.y -= islands['bottom'].bbox['b']
+    helper('top')
+    if islands['top'].faces:
+        offset.y += islands['top'].bbox['h'] + margin
 
-    for face in islands['right'].faces:
-        for loop in face.loops:
-            if islands['front'].faces:
-                loop[uv_layer].uv.x += islands['front'].bbox['w'] + margin
-            loop[uv_layer].uv.x -= islands['right'].bbox['l']
-            loop[uv_layer].uv.y -= islands['right'].bbox['b']
+    helper('bottom')
+    offset.y = 0
+    if islands['front'].faces:
+        offset.x += islands['front'].bbox['w'] + margin
 
-    for face in islands['back'].faces:
-        for loop in face.loops:
-            if islands['front'].faces:
-                loop[uv_layer].uv.x += islands['front'].bbox['w'] + margin
-            if islands['right'].faces:
-                loop[uv_layer].uv.x += islands['right'].bbox['w'] + margin
-            loop[uv_layer].uv.x -= islands['back'].bbox['l']
-            loop[uv_layer].uv.y -= islands['back'].bbox['b']
+    helper('right')
+    if islands['right'].faces:
+        offset.x += islands['right'].bbox['w'] + margin
 
-    for face in islands['left'].faces:
-        for loop in face.loops:
-            if islands['front'].faces:
-                loop[uv_layer].uv.x += islands['front'].bbox['w'] + margin
-            if islands['right'].faces:
-                loop[uv_layer].uv.x += islands['right'].bbox['w'] + margin
-            if islands['back'].faces:
-                loop[uv_layer].uv.x += islands['back'].bbox['w'] + margin
-            loop[uv_layer].uv.x -= islands['left'].bbox['l']
-            loop[uv_layer].uv.y -= islands['left'].bbox['b']
+    helper('back')
+    if islands['back'].faces:
+        offset.x += islands['back'].bbox['w'] + margin
+
+    helper('left')
 
     return islands

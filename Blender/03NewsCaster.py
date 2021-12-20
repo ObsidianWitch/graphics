@@ -329,7 +329,7 @@ def setup_reference():
         obj.display_type = 'WIRE'
 
 def setup_scene():
-    D.scenes[0].collection.objects.link(Character.torso())
+    D.scenes[0].collection.objects.link(Character.object())
 
 if __name__ == '__main__':
     shared.delete_data()
