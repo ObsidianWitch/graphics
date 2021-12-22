@@ -34,7 +34,7 @@ class Character:
         # mesh & object
         bm = bmesh.new()
         bm_absorb_obj(bm, cls.head())
-        bm_absorb_obj(bm, cls.arms())
+        bm_absorb_obj(bm, cls.arm())
         bm_absorb_obj(bm, cls.pelvis())
         bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
             merge_dist=0.001, axis='X', mirror_u=True)
@@ -91,16 +91,14 @@ class Character:
         bmesh.ops.pointmerge(bm, verts=(pokev[0], sphv[2]), merge_co=pokev[0].co)
 
         # UVs
-        islands = shared.uv_cube_project(bm, uv_layer)
-        shared.uv_cube_position(islands, uv_layer)
+        islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
+        shared.bm_uv_cube_position(islands, uv_layer)
 
         # mesh & object
         mesh = D.meshes.new('head')
         bm.to_mesh(mesh)
         bm.free()
-        object = D.objects.new(mesh.name, mesh)
-
-        return object
+        return D.objects.new(mesh.name, mesh)
 
     @classmethod
     def nose(cls) -> bpy.types.Object:
@@ -178,8 +176,8 @@ class Character:
         bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
             dist=0.0000001, plane_co=(0, 0, 0), plane_no=(1, 0, 0), clear_inner=True)
 
-        islands = shared.uv_cube_project(bm, uv_layer)
-        shared.uv_cube_position(islands, uv_layer)
+        islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
+        shared.bm_uv_cube_position(islands, uv_layer)
 
         # mesh & object
         mesh = D.meshes.new('torso')
@@ -188,8 +186,9 @@ class Character:
         return D.objects.new(mesh.name, mesh)
 
     @classmethod
-    def arms(cls) -> bpy.types.Object:
+    def arm(cls) -> bpy.types.Object:
         bm = bmesh.new()
+        uv_layer = bm.loops.layers.uv.new()
 
         l1 = create_plane(bm, fill=True)
         bmesh.ops.scale(bm, verts=l1['verts'], vec=(0.11, 0.07, 1.0))
@@ -235,15 +234,19 @@ class Character:
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
-        mesh = D.meshes.new('arms')
+        islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
+        shared.bm_uv_cube_position(islands, uv_layer)
+
+        mesh = D.meshes.new('arm')
         bm.to_mesh(mesh)
         bm.free()
-
         return D.objects.new(mesh.name, mesh)
 
     @classmethod
-    def legs(cls) -> bpy.types.Object:
+    def leg(cls) -> bpy.types.Object:
         bm = bmesh.new()
+        uv_layer = bm.loops.layers.uv.new()
+
         ltop = create_plane(bm, fill=False)
         bmesh.ops.scale(bm, verts=ltop['verts'], vec=(0.16, 0.16, 1.0))
         bmesh.ops.scale(bm, verts=ltop['verts'][1::2], vec=(1.0, 1.15, 1.0))
@@ -267,17 +270,22 @@ class Character:
 
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
 
-        mesh = D.meshes.new('legs')
+        islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
+        shared.bm_uv_cube_position(islands, uv_layer)
+
+        mesh = D.meshes.new('leg')
         bm.to_mesh(mesh)
         bm.free()
         return D.objects.new(mesh.name, mesh)
 
     @classmethod
     def pelvis(cls) -> bpy.types.Object:
-        # create pelvis from torso and legs
         bm = bmesh.new()
+        uv_layer = bm.loops.layers.uv.new()
+
+        # create pelvis from torso and leg
         bm_absorb_obj(bm, cls.torso())
-        bm_absorb_obj(bm, cls.legs())
+        bm_absorb_obj(bm, cls.leg())
         bmesh.ops.bridge_loops(bm, edges=bm.edges[6:8] + bm.edges[17:18] + bm.edges[25:29])
         bmesh.ops.subdivide_edges(bm, edges=bm.edges[55:57], cuts=1)
         bm.verts.ensure_lookup_table()
@@ -285,7 +293,11 @@ class Character:
         bm.verts[33].co.y = bm.verts[19].co.y
         bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=0.0001)
 
-        mesh = D.meshes.new('torso_pelvis_legs')
+        # uvs
+        islands = shared.bm_uv_cube_project(bm.faces[23:26], uv_layer)
+        shared.bm_uv_cube_position(islands, uv_layer)
+
+        mesh = D.meshes.new('torso_pelvis_leg')
         bm.to_mesh(mesh)
         bm.free()
         return D.objects.new(mesh.name, mesh)

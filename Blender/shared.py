@@ -36,7 +36,7 @@ class UVIsland:
         return self.bbox
 
 # Unwrap UVs using cube projection.
-def uv_cube_project(bm, uv_layer):
+def bm_uv_cube_project(faces, uv_layer):
     islands = { 'top':   UVIsland(), 'bottom': UVIsland(),
                 'front': UVIsland(), 'back':   UVIsland(),
                 'right': UVIsland(), 'left':   UVIsland() }
@@ -44,7 +44,7 @@ def uv_cube_project(bm, uv_layer):
     # unwrap UVs using cube projection
     # note: faces loops produce split UVs, verts link_loops produce stitched UVs
     # ref: blender source uvedit_unwrap_cube_project() & axis_dominant_v3()
-    for face in bm.faces:
+    for face in faces:
         n = face.normal
         # pick the 2 non-dominant axes for the projection
         if abs(n.z) >= abs(n.x) and abs(n.z) >= abs(n.y):
@@ -68,7 +68,7 @@ def uv_cube_project(bm, uv_layer):
     return islands
 
 # Position islands resulting from a cube projection.
-def uv_cube_position(islands, uv_layer, center=True, margin=0.01):
+def bm_uv_cube_position(islands, uv_layer, center=True, margin=0.01):
     def helper(key, offset, contrib_offset):
         for face in islands[key].faces:
             for loop in face.loops:
