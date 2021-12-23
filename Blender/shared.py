@@ -68,24 +68,30 @@ def bm_uv_cube_project(faces, uv_layer):
     return islands
 
 # Position islands resulting from a cube projection.
-def bm_uv_cube_position(islands, uv_layer, center=True, margin=0.01):
-    def helper(key, offset, contrib_offset):
+def bm_uv_cube_position(islands, uv_layer, init_offset=Vector((0.5, 0.0)), margin=0.01):
+    def do_position(key, offset):
         for face in islands[key].faces:
             for loop in face.loops:
                 loop[uv_layer].uv.x += offset.x - islands[key].bbox['l']
                 loop[uv_layer].uv.y += offset.y - islands[key].bbox['b']
+    def do_offset(key, offset, axis):
         if islands[key].faces:
-            offset.x += contrib_offset[0] * (islands[key].bbox['w'] + margin)
-            offset.y += contrib_offset[1] * (islands[key].bbox['h'] + margin)
+            offset.x += axis[0] * (islands[key].bbox['w'] + margin)
+            offset.y += axis[1] * (islands[key].bbox['h'] + margin)
 
-    offset = Vector((0.5 if center else 0.0, 0.0))
-    helper('front', offset, contrib_offset=(0, 1))
-    helper('top', offset, contrib_offset=(0, 1))
-    helper('bottom', offset, contrib_offset=(0, 0))
-    offset.y = 0
-    if islands['front'].faces:
-        offset.x += islands['front'].bbox['w'] + margin
+    # place front, top and bottom islands on the same row
+    offset = init_offset.copy()
+    do_position('front', offset)
+    do_offset('front', offset, axis=(0, 1))
+    do_position('top', offset)
+    do_offset('top', offset, axis=(0, 1))
+    do_position('bottom', offset)
 
-    helper('right', offset, contrib_offset=(1, 0))
-    helper('back', offset, contrib_offset=(1, 0))
-    helper('left', offset, contrib_offset=(0, 0))
+    # place right, back and left islands on the same column as the front island
+    offset = init_offset.copy()
+    do_offset('front', offset, axis=(1, 0))
+    do_position('right', offset)
+    do_offset('right', offset, axis=(1, 0))
+    do_position('back', offset)
+    do_offset('back', offset, axis=(1, 0))
+    do_position('left', offset)
