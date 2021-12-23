@@ -3,7 +3,7 @@
 # blender: 3.0
 # ref: Mega Man Legends News Caster
 
-import sys, math, importlib
+import sys, importlib
 from math import radians
 
 import bpy, bmesh
@@ -26,7 +26,8 @@ importlib.reload(shared)
 def create_plane(bm, fill):
     result = bmesh.ops.create_grid(bm, x_segments=0, y_segments=0, size=0.5)
     if not fill:
-        bmesh.ops.delete(bm, geom=result['verts'][0].link_faces, context='FACES_ONLY')
+        bmesh.ops.delete(bm, geom=result['verts'][0].link_faces,
+                         context='FACES_ONLY')
     return result
 
 def bm_absorb_obj(bm, obj):
@@ -43,7 +44,7 @@ class Character:
         bm_absorb_obj(bm, cls.arm())
         bm_absorb_obj(bm, cls.pelvis())
         bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
-            merge_dist=0.001, axis='X', mirror_u=True)
+                         merge_dist=0.001, axis='X', mirror_u=True)
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
 
@@ -75,7 +76,7 @@ class Character:
         bmesh.ops.scale(bm, verts=sphv, vec=(0.36, 0.37, 0.35))
         bmesh.ops.translate(bm, verts=sphv, vec=(0.0, 0.03, 1.53))
         bmesh.ops.bisect_plane(bm, geom=sphv, dist=0.0000001, plane_co=(0, 0, 0),
-            plane_no=(1, 0, 0), clear_inner=True)
+                               plane_no=(1, 0, 0), clear_inner=True)
         sphv = bm.verts[:]
 
         # tweak right
@@ -87,7 +88,7 @@ class Character:
         sphv[14].co.y -= 0.01
         sphv[15].co.z = sphv[14].co.z
         bmesh.ops.rotate(bm, cent=sphv[15].co, verts=sphv[2:15:4] + sphv[15:16],
-            matrix=Rotation(radians(10), 4, 'X'))
+                         matrix=Rotation(radians(10), 4, 'X'))
         bmesh.ops.scale(bm, verts=sphv[7:11], vec=(1.0, 0.0, 1.0))
         bmesh.ops.translate(bm, verts=sphv[7:11], vec=(0.0, -0.08, 0.0))
         sphv[10].co.z += 0.015
@@ -118,8 +119,8 @@ class Character:
         # bmesh
         bm = bmesh.new()
         uv_layer = bm.loops.layers.uv.new()
-        conev = bmesh.ops.create_cone(bm, segments=3, radius1=1.0,
-            radius2=0.0, depth=1.0)['verts']
+        conev = bmesh.ops.create_cone(bm, segments=3, radius1=1.0, radius2=0.0,
+                                      depth=1.0)['verts']
         bmesh.ops.rotate(bm, verts=conev, matrix=Rotation(radians(90), 3, 'X'))
         bmesh.ops.scale(bm, verts=conev, vec=(0.02, 0.04, 0.04))
         bmesh.ops.translate(bm, verts=conev, vec=(0.0, -0.122, 1.443))
@@ -187,7 +188,8 @@ class Character:
 
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
         bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
-            dist=0.0000001, plane_co=(0, 0, 0), plane_no=(1, 0, 0), clear_inner=True)
+                               dist=0.0000001, plane_co=(0, 0, 0),
+                               plane_no=(1, 0, 0), clear_inner=True)
 
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
         offset = Vec(0.5, islands['front'].bbox['b'] + 0.6)
@@ -277,7 +279,7 @@ class Character:
 
         lfeet = create_plane(bm, fill=True)['verts']
         bmesh.ops.scale(bm, verts=lfeet, vec=(0.1, 0.06, 1.0))
-        bmesh.ops.translate(bm, verts=lfeet, vec=(0.06625, -0.178+0.03, 0.0))
+        bmesh.ops.translate(bm, verts=lfeet, vec=(0.06625, -0.178 + 0.03, 0.0))
         bmesh.ops.rotate(bm, verts=lfeet, cent=lfeet[0].co,
                          matrix=Rotation(radians(80), 4, 'X'))
 
@@ -300,7 +302,8 @@ class Character:
         # create pelvis from torso and leg
         bm_absorb_obj(bm, cls.torso())
         bm_absorb_obj(bm, cls.leg())
-        bmesh.ops.bridge_loops(bm, edges=bm.edges[6:8] + bm.edges[17:18] + bm.edges[25:29])
+        bmesh.ops.bridge_loops(bm, edges=bm.edges[6:8] + bm.edges[17:18]
+                               + bm.edges[25:29])
         bmesh.ops.subdivide_edges(bm, edges=bm.edges[55:57], cuts=1)
         bm.verts.ensure_lookup_table()
         bm.verts[32].co = bm.verts[19].co
@@ -345,9 +348,9 @@ class Character:
         return D.images.load(filepath, check_existing=True)
 
 def import_from_blend(filepath, type, name):
-    bpy.ops.wm.append(filepath  = f"{filepath}/{type}/{name}",
-                      directory = f"{filepath}/{type}",
-                      filename  = name)
+    bpy.ops.wm.append(filepath=f"{filepath}/{type}/{name}",
+                      directory=f"{filepath}/{type}",
+                      filename=name)
 
 def setup_reference():
     import_from_blend('03Reference.blend', 'Collection', 'References')
