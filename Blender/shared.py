@@ -8,6 +8,15 @@ def delete_data():
         for item in data:
             data.remove(item)
 
+def setup_reference(blendpath, type='Collection', name='References'):
+    bpy.ops.wm.append(filepath=f"{filepath}/{type}/{name}",
+                      directory=f"{filepath}/{type}",
+                      filename=name)
+    for obj in bpy.data.collections['References'].objects:
+        obj.hide_viewport = True
+        obj.show_in_front = True
+        obj.display_type = 'WIRE'
+
 def new_obj(bmesh_op, name, *args, **kwargs):
     bm = bmesh.new()
     bmesh_op(bm, *args, **kwargs)

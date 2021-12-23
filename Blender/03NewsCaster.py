@@ -347,22 +347,6 @@ class Character:
         image.save(filepath)
         return D.images.load(filepath, check_existing=True)
 
-def import_from_blend(filepath, type, name):
-    bpy.ops.wm.append(filepath=f"{filepath}/{type}/{name}",
-                      directory=f"{filepath}/{type}",
-                      filename=name)
-
-def setup_reference():
-    import_from_blend('03Reference.blend', 'Collection', 'References')
-    references = D.collections['References'].objects
-    for obj in references:
-        obj.hide_viewport = False
-        obj.show_in_front = True
-        obj.display_type = 'WIRE'
-
-def setup_scene():
-    D.scenes[0].collection.objects.link(Character.object())
-
 if __name__ == '__main__':
     shared.delete_data()
-    setup_scene()
+    D.scenes[0].collection.objects.link(Character.object())
