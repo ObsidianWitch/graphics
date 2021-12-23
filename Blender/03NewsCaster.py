@@ -33,6 +33,7 @@ class Character:
     def object(cls):
         # mesh & object
         bm = bmesh.new()
+        uv_layer = bm.loops.layers.uv.new()
         bm_absorb_obj(bm, cls.head())
         bm_absorb_obj(bm, cls.arm())
         bm_absorb_obj(bm, cls.pelvis())
@@ -40,6 +41,12 @@ class Character:
             merge_dist=0.001, axis='X', mirror_u=True)
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
+
+        for face in bm.faces:
+            for loop in face.loops:
+                loop[uv_layer].uv.x -= 0.5
+                loop[uv_layer].uv *= 0.27
+                loop[uv_layer].uv.x += 0.5
 
         mesh = D.meshes.new('character')
         bm.to_mesh(mesh)
@@ -92,7 +99,8 @@ class Character:
 
         # UVs
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
-        shared.bm_uv_cube_position(islands, uv_layer)
+        offset = Vector((0.5, islands['front'].bbox['b'] + 1.5))
+        shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         # mesh & object
         mesh = D.meshes.new('head')
@@ -117,7 +125,7 @@ class Character:
         for vert in bm.verts:
             for loop in vert.link_loops:
                 loop[uv_layer].uv = bm.verts[3].co.xz
-                loop[uv_layer].uv.x += 0.5
+                loop[uv_layer].uv += Vector((0.5, 1.5))
 
         # mesh & object
         mesh = D.meshes.new('nose')
@@ -143,7 +151,7 @@ class Character:
         for vert in bm.verts:
             for loop in vert.link_loops:
                 loop[uv_layer].uv = bm.verts[5].co.xz
-                loop[uv_layer].uv.x += 0.5
+                loop[uv_layer].uv += Vector((0.5, 1.5))
 
         # mesh & object
         mesh = D.meshes.new('neck')
@@ -177,7 +185,8 @@ class Character:
             dist=0.0000001, plane_co=(0, 0, 0), plane_no=(1, 0, 0), clear_inner=True)
 
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
-        shared.bm_uv_cube_position(islands, uv_layer)
+        offset = Vector((0.5, islands['front'].bbox['b'] + 0.6))
+        shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         # mesh & object
         mesh = D.meshes.new('torso')
@@ -235,7 +244,8 @@ class Character:
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
-        shared.bm_uv_cube_position(islands, uv_layer)
+        offset = Vector((0.5, islands['front'].bbox['b'] + 1.25))
+        shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         mesh = D.meshes.new('arm')
         bm.to_mesh(mesh)
@@ -271,7 +281,8 @@ class Character:
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
 
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
-        shared.bm_uv_cube_position(islands, uv_layer)
+        offset = Vector((0.5, islands['front'].bbox['b']))
+        shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         mesh = D.meshes.new('leg')
         bm.to_mesh(mesh)
@@ -294,8 +305,9 @@ class Character:
         bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=0.0001)
 
         # uvs
-        islands = shared.bm_uv_cube_project(bm.faces[23:26], uv_layer)
-        shared.bm_uv_cube_position(islands, uv_layer)
+        islands = shared.bm_uv_cube_project(bm.faces[23:27], uv_layer)
+        offset = Vector((0.5, islands['front'].bbox['b'] + 0.55))
+        shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         mesh = D.meshes.new('torso_pelvis_leg')
         bm.to_mesh(mesh)
