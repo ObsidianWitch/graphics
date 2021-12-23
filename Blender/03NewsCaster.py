@@ -4,13 +4,18 @@
 # ref: Mega Man Legends News Caster
 
 import sys, math, importlib
+from math import radians
+
 import bpy, bmesh
+from mathutils import Matrix, Vector
 C = bpy.context
 D = bpy.data
-from mathutils import Matrix, Vector
+def Mat(*args): return Matrix(args)
+def Vec(*args): return Vector(args)
 Diagonal = Matrix.Diagonal
 Rotation = Matrix.Rotation
 Translation = Matrix.Translation
+
 import PIL.Image # https://pypi.org/project/Pillow/
 
 if '.' not in sys.path:
@@ -82,7 +87,7 @@ class Character:
         sphv[14].co.y -= 0.01
         sphv[15].co.z = sphv[14].co.z
         bmesh.ops.rotate(bm, cent=sphv[15].co, verts=sphv[2:15:4] + sphv[15:16],
-            matrix=Rotation(math.radians(10), 4, 'X'))
+            matrix=Rotation(radians(10), 4, 'X'))
         bmesh.ops.scale(bm, verts=sphv[7:11], vec=(1.0, 0.0, 1.0))
         bmesh.ops.translate(bm, verts=sphv[7:11], vec=(0.0, -0.08, 0.0))
         sphv[10].co.z += 0.015
@@ -94,12 +99,12 @@ class Character:
 
         # hair back spike
         pokev = bmesh.ops.poke(bm, faces=sphv[2].link_faces[0:1])['verts']
-        pokev[0].co += Vector((-pokev[0].co.x, 0.06, -0.09))
+        pokev[0].co += Vec(-pokev[0].co.x, 0.06, -0.09)
         bmesh.ops.pointmerge(bm, verts=(pokev[0], sphv[2]), merge_co=pokev[0].co)
 
         # UVs
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
-        offset = Vector((0.5, islands['front'].bbox['b'] + 1.5))
+        offset = Vec(0.5, islands['front'].bbox['b'] + 1.5)
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         # mesh & object
@@ -115,7 +120,7 @@ class Character:
         uv_layer = bm.loops.layers.uv.new()
         conev = bmesh.ops.create_cone(bm, segments=3, radius1=1.0,
             radius2=0.0, depth=1.0)['verts']
-        bmesh.ops.rotate(bm, verts=conev, matrix=Rotation(math.radians(90), 3, 'X'))
+        bmesh.ops.rotate(bm, verts=conev, matrix=Rotation(radians(90), 3, 'X'))
         bmesh.ops.scale(bm, verts=conev, vec=(0.02, 0.04, 0.04))
         bmesh.ops.translate(bm, verts=conev, vec=(0.0, -0.122, 1.443))
         conev[0].co.y -= 0.01
@@ -125,7 +130,7 @@ class Character:
         for vert in bm.verts:
             for loop in vert.link_loops:
                 loop[uv_layer].uv = bm.verts[3].co.xz
-                loop[uv_layer].uv += Vector((0.5, 1.5))
+                loop[uv_layer].uv += Vec(0.5, 1.5)
 
         # mesh & object
         mesh = D.meshes.new('nose')
@@ -151,7 +156,7 @@ class Character:
         for vert in bm.verts:
             for loop in vert.link_loops:
                 loop[uv_layer].uv = bm.verts[5].co.xz
-                loop[uv_layer].uv += Vector((0.5, 1.5))
+                loop[uv_layer].uv += Vec(0.5, 1.5)
 
         # mesh & object
         mesh = D.meshes.new('neck')
@@ -185,7 +190,7 @@ class Character:
             dist=0.0000001, plane_co=(0, 0, 0), plane_no=(1, 0, 0), clear_inner=True)
 
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
-        offset = Vector((0.5, islands['front'].bbox['b'] + 0.6))
+        offset = Vec(0.5, islands['front'].bbox['b'] + 0.6)
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         # mesh & object
@@ -202,32 +207,32 @@ class Character:
         l1 = create_plane(bm, fill=True)
         bmesh.ops.scale(bm, verts=l1['verts'], vec=(0.11, 0.07, 1.0))
         bmesh.ops.rotate(bm, verts=l1['verts'], cent=l1['verts'][0].co,
-                         matrix=Rotation(math.radians(10), 4, 'Y'))
+                         matrix=Rotation(radians(10), 4, 'Y'))
 
         l2 = create_plane(bm, fill=False)
         bmesh.ops.scale(bm, verts=l2['verts'], vec=(0.14, 0.07, 1.0))
         bmesh.ops.translate(bm, verts=l2['verts'], vec=l1['verts'][0].co - l2['verts'][0].co)
         bmesh.ops.rotate(bm, verts=l2['verts'], cent=l1['verts'][0].co,
-                         matrix=Rotation(math.radians(15), 4, 'Y'))
+                         matrix=Rotation(radians(15), 4, 'Y'))
 
         l3 = create_plane(bm, fill=False)
         bmesh.ops.scale(bm, verts=l3['verts'], vec=(0.16, 0.07, 1.0))
         bmesh.ops.translate(bm, verts=l3['verts'], vec=l1['verts'][0].co - l3['verts'][0].co)
         bmesh.ops.rotate(bm, verts=l3['verts'], cent=l1['verts'][0].co,
-                         matrix=Rotation(math.radians(35), 4, 'Y'))
+                         matrix=Rotation(radians(35), 4, 'Y'))
 
         bmesh.ops.translate(bm, verts=bm.verts, vec=(0.12627, 0.019375, 1.3378))
 
         l4 = create_plane(bm, fill=False)
         bmesh.ops.scale(bm, verts=l4['verts'], vec=(0.07, 0.06, 1.0))
         bmesh.ops.rotate(bm, verts=l4['verts'],
-                         matrix=Rotation(math.radians(-10), 4, 'Y'))
+                         matrix=Rotation(radians(-10), 4, 'Y'))
         bmesh.ops.translate(bm, verts=l4['verts'], vec=(0.20385, 0.02, 1.0928))
 
         l5 = create_plane(bm, fill=False)
         bmesh.ops.scale(bm, verts=l5['verts'], vec=(0.08, 0.06, 1.0))
         bmesh.ops.rotate(bm, verts=l5['verts'],
-                         matrix=Rotation(math.radians(-12), 4, 'Y'))
+                         matrix=Rotation(radians(-12), 4, 'Y'))
         bmesh.ops.translate(bm, verts=l5['verts'], vec=(0.24261, 0.02, 0.94141))
 
         l6 = create_plane(bm, fill=False)
@@ -244,7 +249,7 @@ class Character:
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
-        offset = Vector((0.5, islands['front'].bbox['b'] + 1.25))
+        offset = Vec(0.5, islands['front'].bbox['b'] + 1.25)
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         mesh = D.meshes.new('arm')
@@ -276,12 +281,12 @@ class Character:
         bmesh.ops.scale(bm, verts=lfeet['verts'], vec=(0.1, 0.06, 1.0))
         bmesh.ops.translate(bm, verts=lfeet['verts'], vec=(0.06625, -0.178+0.03, 0.0))
         bmesh.ops.rotate(bm, verts=lfeet['verts'], cent=lfeet['verts'][0].co,
-                         matrix=Rotation(math.radians(80), 4, 'X'))
+                         matrix=Rotation(radians(80), 4, 'X'))
 
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
 
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
-        offset = Vector((0.5, islands['front'].bbox['b']))
+        offset = Vec(0.5, islands['front'].bbox['b'])
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         mesh = D.meshes.new('leg')
@@ -306,7 +311,7 @@ class Character:
 
         # uvs
         islands = shared.bm_uv_cube_project(bm.faces[23:27], uv_layer)
-        offset = Vector((0.5, islands['front'].bbox['b'] + 0.55))
+        offset = Vec(0.5, islands['front'].bbox['b'] + 0.55)
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
 
         mesh = D.meshes.new('torso_pelvis_leg')
