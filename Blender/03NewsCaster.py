@@ -360,10 +360,29 @@ class Character:
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
         cls.scale_uvs(bm.faces[23:27], uv_layer, islands)
 
+        # mesh & object
         mesh = D.meshes.new('torso_pelvis_leg')
         bm.to_mesh(mesh)
         bm.free()
-        return D.objects.new(mesh.name, mesh)
+        object = D.objects.new(mesh.name, mesh)
+
+        # texture & material
+        texture = cls.pelvis_texture()
+        material = cls.material(texture)
+        object.data.materials.append(material)
+
+        return object
+
+    @classmethod
+    def pelvis_texture(cls) -> bpy.types.Image:
+        size = (512, 512)
+        image = PIL.Image.new(mode='RGBA', size=size)
+        draw = PIL.ImageDraw.Draw(image)
+        draw.rectangle(xy=((256, 298), (330, 321)), fill=(48, 64, 112))
+
+        filepath = '03TmpPelvis.png'
+        image.save(filepath)
+        return D.images.load(filepath, check_existing=True)
 
     @classmethod
     def material(cls, texture) -> bpy.types.Material:
