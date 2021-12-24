@@ -48,12 +48,6 @@ class Character:
         bm_absorb_obj(bm, cls.nose())
         bm_absorb_obj(bm, cls.neck())
 
-        for face in bm.faces:
-            for loop in face.loops:
-                loop[uv_layer].uv.x -= 0.5
-                loop[uv_layer].uv *= 0.27
-                loop[uv_layer].uv.x += 0.5
-
         mesh = D.meshes.new('character')
         bm.to_mesh(mesh)
         bm.free()
@@ -65,6 +59,16 @@ class Character:
         object.data.materials.append(material)
 
         return object
+
+    @classmethod
+    def scale_uvs(cls, faces, uv_layer, islands={}):
+        for face in faces:
+            for loop in face.loops:
+                loop[uv_layer].uv.x -= 0.5
+                loop[uv_layer].uv *= 0.27
+                loop[uv_layer].uv.x += 0.5
+        for island in islands.values():
+            island.calc_bbox(uv_layer)
 
     @classmethod
     def head(cls) -> bpy.types.Object:
@@ -107,6 +111,7 @@ class Character:
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
         offset = Vec(0.5, islands['front'].bbox['b'] + 1.5)
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
+        cls.scale_uvs(bm.faces, uv_layer, islands)
 
         # mesh & object
         mesh = D.meshes.new('head')
@@ -132,6 +137,7 @@ class Character:
             for loop in vert.link_loops:
                 loop[uv_layer].uv = bm.verts[3].co.xz
                 loop[uv_layer].uv += Vec(0.5, 1.5)
+        cls.scale_uvs(bm.faces, uv_layer)
 
         # mesh & object
         mesh = D.meshes.new('nose')
@@ -158,6 +164,7 @@ class Character:
             for loop in vert.link_loops:
                 loop[uv_layer].uv = bm.verts[5].co.xz
                 loop[uv_layer].uv += Vec(0.5, 1.5)
+        cls.scale_uvs(bm.faces, uv_layer)
 
         # mesh & object
         mesh = D.meshes.new('neck')
@@ -194,6 +201,7 @@ class Character:
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
         offset = Vec(0.5, islands['front'].bbox['b'] + 0.6)
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
+        cls.scale_uvs(bm.faces, uv_layer, islands)
 
         # mesh & object
         mesh = D.meshes.new('torso')
@@ -251,6 +259,7 @@ class Character:
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
         offset = Vec(0.5, islands['front'].bbox['b'] + 1.25)
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
+        cls.scale_uvs(bm.faces, uv_layer, islands)
 
         mesh = D.meshes.new('arm')
         bm.to_mesh(mesh)
@@ -288,6 +297,7 @@ class Character:
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
         offset = Vec(0.5, islands['front'].bbox['b'])
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
+        cls.scale_uvs(bm.faces, uv_layer, islands)
 
         mesh = D.meshes.new('leg')
         bm.to_mesh(mesh)
@@ -314,6 +324,7 @@ class Character:
         islands = shared.bm_uv_cube_project(bm.faces[23:27], uv_layer)
         offset = Vec(0.5, islands['front'].bbox['b'] + 0.55)
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
+        cls.scale_uvs(bm.faces[23:27], uv_layer, islands)
 
         mesh = D.meshes.new('torso_pelvis_leg')
         bm.to_mesh(mesh)
@@ -341,7 +352,7 @@ class Character:
 
     @classmethod
     def texture(cls) -> bpy.types.Image:
-        image = PIL.Image.new(mode='RGB', size=(256, 256), color=(0, 256, 0))
+        image = PIL.Image.new(mode='RGB', size=(256, 256), color=(0, 255, 0))
 
         filepath = '03Texture.png'
         image.save(filepath)
