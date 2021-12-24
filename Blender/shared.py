@@ -28,7 +28,7 @@ def new_obj(bmesh_op, name, *args, **kwargs):
 @dataclasses.dataclass
 class UVIsland:
     faces: list[bmesh.types.BMFace] = dataclasses.field(default_factory=list)
-    bbox: tuple[float, 4] = None
+    bbox: dict[str, float] = None
 
     def calc_bbox(self, uv_layer) -> tuple[float, 4]:
         if not self.faces: return None

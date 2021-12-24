@@ -5,6 +5,7 @@
 
 import sys, importlib
 from math import radians
+from pathlib import Path
 
 import bpy, bmesh
 from mathutils import Matrix, Vector
@@ -16,7 +17,7 @@ Diagonal = Matrix.Diagonal
 Rotation = Matrix.Rotation
 Translation = Matrix.Translation
 
-import PIL.Image # https://pypi.org/project/Pillow/
+import PIL.Image, PIL.ImageDraw # https://pypi.org/project/Pillow/
 
 if '.' not in sys.path:
     sys.path.append('.')
@@ -32,6 +33,8 @@ def create_plane(bm, fill):
 
 def bm_absorb_obj(bm, obj):
     bm.from_mesh(obj.data)
+    for m in obj.data.materials:
+        D.materials.remove(m)
     D.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
 
 class Character:
@@ -268,6 +271,7 @@ class Character:
 
     @classmethod
     def leg(cls) -> bpy.types.Object:
+        # bmesh
         bm = bmesh.new()
         uv_layer = bm.loops.layers.uv.new()
 
@@ -294,15 +298,45 @@ class Character:
 
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
 
+        # UVs
         islands = shared.bm_uv_cube_project(bm.faces, uv_layer)
         offset = Vec(0.5, islands['front'].bbox['b'])
         shared.bm_uv_cube_position(islands, uv_layer, init_offset=offset)
         cls.scale_uvs(bm.faces, uv_layer, islands)
 
+        # mesh & object
         mesh = D.meshes.new('leg')
         bm.to_mesh(mesh)
         bm.free()
-        return D.objects.new(mesh.name, mesh)
+        object = D.objects.new(mesh.name, mesh)
+
+        # texture & material
+        texture = cls.leg_texture()
+        material = cls.material(texture)
+        object.data.materials.append(material)
+
+        return object
+
+    @classmethod
+    def leg_texture(cls) -> bpy.types.Image:
+        size = (512, 512)
+        image = PIL.Image.new(mode='RGBA', size=size)
+        draw = PIL.ImageDraw.Draw(image)
+
+        # skirt
+        draw.rectangle(xy=((256, 385), (390, 410)), fill=(48, 64, 112))
+        draw.rectangle(xy=((256, 409), (390, 410)), fill=(24, 40, 88))
+
+        # knee
+        draw.ellipse(xy=((260, 437), (269, 448)), fill=(240, 176, 128))
+
+        # shoe
+        draw.rectangle(xy=((256, 489), (390, 512)), fill=(224, 232, 232))
+        draw.rectangle(xy=((256, 378), (269, 384)), fill=(224, 232, 232))
+
+        filepath = '03TmpLeg.png'
+        image.save(filepath)
+        return D.images.load(filepath, check_existing=True)
 
     @classmethod
     def pelvis(cls) -> bpy.types.Object:
@@ -352,10 +386,19 @@ class Character:
 
     @classmethod
     def texture(cls) -> bpy.types.Image:
-        image = PIL.Image.new(mode='RGB', size=(256, 256), color=(0, 255, 0))
+        img_tmp = PIL.Image.new(mode='RGBA', size=(512, 512))
+        for p in Path().glob('03Tmp*.png'):
+            if str(p) in D.images:
+                D.images.remove(D.images[str(p)])
+            img_in = PIL.Image.open(p)
+            img_tmp.alpha_composite(img_in)
+        img_tmp.alpha_composite(img_tmp.transpose(PIL.Image.FLIP_LEFT_RIGHT))
+
+        img_out = PIL.Image.new(mode='RGBA', size=(512, 512), color=(248, 208, 168))
+        img_out.alpha_composite(img_tmp)
 
         filepath = '03Texture.png'
-        image.save(filepath)
+        img_out.save(filepath)
         return D.images.load(filepath, check_existing=True)
 
 if __name__ == '__main__':
