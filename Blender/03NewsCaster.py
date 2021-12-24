@@ -333,6 +333,7 @@ class Character:
         # shoe
         draw.rectangle(xy=((256, 489), (390, 512)), fill=(224, 232, 232))
         draw.rectangle(xy=((256, 378), (269, 384)), fill=(224, 232, 232))
+        draw.rectangle(xy=((256, 325), (269, 361)), fill=(224, 232, 232))
 
         filepath = '03TmpLeg.png'
         image.save(filepath)
