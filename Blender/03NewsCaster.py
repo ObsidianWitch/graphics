@@ -225,9 +225,9 @@ class Character:
         image = PIL.Image.new(mode='RGBA', size=size)
         draw = PIL.ImageDraw.Draw(image)
 
-        # skirt
+        # jeans
         draw.rectangle(xy=((256, 280), (317, 291)), fill=(48, 64, 112))
-        draw.rectangle(xy=((256, 280), (317, 281)), fill=(24, 40, 88))
+        draw.line(xy=((256, 283), (317, 282)), fill=(24, 40, 88))
 
         # shirt
         draw.rectangle(xy=((256, 242), (317, 279)), fill=(224, 232, 232))
@@ -348,12 +348,9 @@ class Character:
         image = PIL.Image.new(mode='RGBA', size=size)
         draw = PIL.ImageDraw.Draw(image)
 
-        # skirt
-        draw.rectangle(xy=((256, 385), (390, 410)), fill=(48, 64, 112))
-        draw.rectangle(xy=((256, 409), (390, 410)), fill=(24, 40, 88))
-
-        # knee
-        draw.ellipse(xy=((260, 437), (269, 448)), fill=(240, 176, 128))
+        # jeans
+        draw.rectangle(xy=((256, 385), (390, 480)), fill=(48, 64, 112))
+        draw.rectangle(xy=((256, 478), (390, 480)), fill=(24, 40, 88))
 
         # shoe
         draw.rectangle(xy=((256, 489), (390, 512)), fill=(224, 232, 232))
@@ -407,6 +404,7 @@ class Character:
         size = (512, 512)
         image = PIL.Image.new(mode='RGBA', size=size)
         draw = PIL.ImageDraw.Draw(image)
+
         draw.rectangle(xy=((256, 297), (330, 321)), fill=(48, 64, 112))
         image.alpha_composite(image.transpose(PIL.Image.FLIP_LEFT_RIGHT))
 
