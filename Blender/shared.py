@@ -78,11 +78,15 @@ def bm_uv_cube_project(faces, uv_layer):
 
 # Position islands resulting from a cube projection.
 def bm_uv_cube_position(islands, uv_layer, init_offset=Vector((0.5, 0.0)), margin=0.01):
+    # position islands at (0, 0), offset them and update the bbox
     def do_position(key, offset):
         for face in islands[key].faces:
             for loop in face.loops:
                 loop[uv_layer].uv.x += offset.x - islands[key].bbox['l']
                 loop[uv_layer].uv.y += offset.y - islands[key].bbox['b']
+        islands[key].calc_bbox(uv_layer)
+
+    # select which axis of the specified island will contribute to the offset
     def do_offset(key, offset, axis):
         if islands[key].faces:
             offset.x += axis[0] * (islands[key].bbox['w'] + margin)
