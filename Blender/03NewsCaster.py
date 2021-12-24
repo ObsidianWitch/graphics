@@ -210,7 +210,45 @@ class Character:
         mesh = D.meshes.new('torso')
         bm.to_mesh(mesh)
         bm.free()
-        return D.objects.new(mesh.name, mesh)
+        object = D.objects.new(mesh.name, mesh)
+
+        # texture & material
+        texture = cls.torso_texture()
+        material = cls.material(texture)
+        object.data.materials.append(material)
+
+        return object
+
+    @classmethod
+    def torso_texture(cls) -> bpy.types.Image:
+        size = (512, 512)
+        image = PIL.Image.new(mode='RGBA', size=size)
+        draw = PIL.ImageDraw.Draw(image)
+
+        # skirt
+        draw.rectangle(xy=((256, 280), (317, 291)), fill=(48, 64, 112))
+        draw.rectangle(xy=((256, 280), (317, 281)), fill=(24, 40, 88))
+
+        # shirt
+        draw.rectangle(xy=((256, 242), (317, 279)), fill=(224, 232, 232))
+        draw.rectangle(xy=((265, 227), (262, 242)), fill=(224, 232, 232))
+        draw.polygon(xy=((256, 242), (261, 242), (256, 250)), fill=(248, 208, 168))
+        draw.line(xy=((256, 251), (260, 253), (265, 242), (317, 242)),
+                  fill=(200, 200, 200))
+
+        # mirror
+        image.alpha_composite(image.transpose(PIL.Image.FLIP_LEFT_RIGHT))
+
+        # buttons
+        draw.line(xy=((256, 251), (256, 279)), fill=(200, 200, 200))
+        for y in range(4):
+            y *= 7
+            draw.rectangle(xy=((253, 255 + y), (254, 256 + y)),
+                           fill=(190, 190, 190))
+
+        filepath = '03TmpTorso.png'
+        image.save(filepath)
+        return D.images.load(filepath, check_existing=True)
 
     @classmethod
     def arm(cls) -> bpy.types.Object:
@@ -335,6 +373,9 @@ class Character:
         draw.rectangle(xy=((256, 378), (269, 384)), fill=(224, 232, 232))
         draw.rectangle(xy=((256, 325), (269, 361)), fill=(224, 232, 232))
 
+        # mirror
+        image.alpha_composite(image.transpose(PIL.Image.FLIP_LEFT_RIGHT))
+
         filepath = '03TmpLeg.png'
         image.save(filepath)
         return D.images.load(filepath, check_existing=True)
@@ -379,7 +420,8 @@ class Character:
         size = (512, 512)
         image = PIL.Image.new(mode='RGBA', size=size)
         draw = PIL.ImageDraw.Draw(image)
-        draw.rectangle(xy=((256, 298), (330, 321)), fill=(48, 64, 112))
+        draw.rectangle(xy=((256, 297), (330, 321)), fill=(48, 64, 112))
+        image.alpha_composite(image.transpose(PIL.Image.FLIP_LEFT_RIGHT))
 
         filepath = '03TmpPelvis.png'
         image.save(filepath)
@@ -406,16 +448,12 @@ class Character:
 
     @classmethod
     def texture(cls) -> bpy.types.Image:
-        img_tmp = PIL.Image.new(mode='RGBA', size=(512, 512))
+        img_out = PIL.Image.new(mode='RGBA', size=(512, 512), color=(248, 208, 168))
         for p in Path().glob('03Tmp*.png'):
             if str(p) in D.images:
                 D.images.remove(D.images[str(p)])
             img_in = PIL.Image.open(p)
-            img_tmp.alpha_composite(img_in)
-        img_tmp.alpha_composite(img_tmp.transpose(PIL.Image.FLIP_LEFT_RIGHT))
-
-        img_out = PIL.Image.new(mode='RGBA', size=(512, 512), color=(248, 208, 168))
-        img_out.alpha_composite(img_tmp)
+            img_out.alpha_composite(img_in)
 
         filepath = '03Texture.png'
         img_out.save(filepath)
