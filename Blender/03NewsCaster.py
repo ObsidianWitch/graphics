@@ -120,7 +120,43 @@ class Character:
         mesh = D.meshes.new('head')
         bm.to_mesh(mesh)
         bm.free()
-        return D.objects.new(mesh.name, mesh)
+        object = D.objects.new(mesh.name, mesh)
+
+        # texture & material
+        texture = cls.head_texture()
+        material = cls.material(texture)
+        object.data.materials.append(material)
+
+        return object
+
+    @classmethod
+    def head_texture(cls) -> bpy.types.Image:
+        size = (512, 512)
+        image = PIL.Image.new(mode='RGBA', size=size)
+        draw = PIL.ImageDraw.Draw(image)
+
+        # hair & face
+        draw.rectangle(xy=((256, 0), (336, 116)), fill=(28, 22, 19))
+        draw.rectangle(xy=((256, 94), (276, 116)), fill=(248, 208, 168))
+        draw.rectangle(xy=((256, 23), (276, 38)), fill=(248, 208, 168))
+        draw.polygon(xy=((261, 94), (262, 88), (263, 94)), fill=(248, 208, 168))
+        draw.polygon(xy=((271, 94), (272, 90), (272, 94)), fill=(248, 208, 168))
+
+        # eyes
+        x, y = 260, 97
+        draw.ellipse(xy=((x+0, y+0), (x+7, y+4)), fill=(220, 220, 220))
+        draw.rectangle(xy=((x+2, y+0), (x+3, y+4)), fill=(48, 64, 112))
+        draw.line(xy=((x+0, y-1), (x+3, y-3), (x+7, y-1)), fill=(56, 40, 32))
+
+        # lips
+        draw.line(xy=((256, 110), (257, 110)), fill=(240, 176, 128))
+
+        # mirror
+        image.alpha_composite(image.transpose(PIL.Image.FLIP_LEFT_RIGHT))
+
+        filepath = '03TmpHead.png'
+        image.save(filepath)
+        return D.images.load(filepath, check_existing=True)
 
     @classmethod
     def nose(cls) -> bpy.types.Object:
@@ -227,7 +263,7 @@ class Character:
 
         # jeans
         draw.rectangle(xy=((256, 280), (317, 291)), fill=(48, 64, 112))
-        draw.line(xy=((256, 283), (317, 282)), fill=(24, 40, 88))
+        draw.line(xy=((256, 283), (317, 283)), fill=(24, 40, 88))
 
         # shirt
         draw.rectangle(xy=((256, 242), (317, 279)), fill=(224, 232, 232))
