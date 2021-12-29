@@ -4,6 +4,7 @@ The scripts must be executed from their respective directories, e.g. `cd BPY; ./
 
 ## [BPY/](https://github.com/obsiwitch/graphics/tree/main/BPY)
 
+[<img src="https://i.imgur.com/XDJTSwJ.jpg" width="400px"/>](https://github.com/obsiwitch/graphics/blob/main/BPY/04LimbTopology.py)
 [<img src="https://i.imgur.com/INZLLlV.jpg" width="400px"/>](https://github.com/obsiwitch/graphics/blob/main/BPY/03NewsCaster.py)
 [<img src="https://i.imgur.com/LJJQbB7.jpg" width="400px"/>](https://github.com/obsiwitch/graphics/blob/main/BPY/02CubeOwl.py)
 [<img src="https://i.imgur.com/5ku3mve.jpg" width="400px"/>](https://github.com/obsiwitch/graphics/blob/main/BPY/01CubesGridWave.py)
