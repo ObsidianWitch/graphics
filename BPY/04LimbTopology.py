@@ -7,7 +7,7 @@ import sys, importlib
 from math import radians
 
 import bpy, bmesh
-from mathutils import Quaternion
+from mathutils import Matrix, Quaternion
 C = bpy.context
 D = bpy.data
 
@@ -16,13 +16,13 @@ if '.' not in sys.path:
 import shared
 importlib.reload(shared)
 
-def add_limb_naive() -> bpy.types.Object:
+def add_limb_one_loop() -> bpy.types.Object:
     # bmesh
     bm = bmesh.new()
     bm_cylinder_zcuts(bm, segments=16, radius=0.1, zcuts=(0.2, 0.2))
 
     # mesh & object
-    mesh = D.meshes.new('limb_naive')
+    mesh = D.meshes.new('limb_one_loop')
     object = D.objects.new(mesh.name, mesh)
     C.scene.collection.objects.link(object)
 
@@ -59,6 +59,53 @@ def add_limb_two_loops() -> bpy.types.Object:
         vert[deform_layer][b1_vg.index] = 1.0
     b2_vg = object.vertex_groups.new(name='limb.002')
     for vert in bm.verts[32:]:
+        vert[deform_layer][b2_vg.index] = 1.0
+    bm.to_mesh(mesh)
+    bm.free()
+
+    # armature
+    return add_limb_armature(object, b1_vg.name, b2_vg.name)
+
+def add_limb_one_triangle() -> bpy.types.Object:
+    # bmesh
+    bm = bmesh.new()
+    bmesh.ops.create_circle(bm, segments=16, radius=0.1)
+    c1 = { 'verts': bm.verts[:], 'edges': bm.edges[:], 'faces': bm.faces[:] }
+    c2 = bmesh.ops.extrude_edge_only(bm, edges=c1['edges'])
+    c2 = shared.bm_geom_split(c2['geom'])
+    bmesh.ops.translate(bm, verts=c2['verts'], vec=(0, 0, 0.2))
+    bmesh.ops.transform(bm,
+        verts=c2['verts'][9:],
+        matrix=Matrix.Shear('YZ', 4, (0.0, -1.0))
+    )
+    c3 = bmesh.ops.extrude_edge_only(bm, edges=c2['edges'][8:])
+    c3 = shared.bm_geom_split(c3['geom'])
+    bmesh.ops.transform(bm,
+        verts=c3['verts'],
+        matrix=Matrix.Shear('YZ', 4, (0.0, 2.0))
+    )
+    c4 = bmesh.ops.extrude_edge_only(bm, edges=c2['edges'][0:8] + c3['edges'])
+    c4 = shared.bm_geom_split(c4['geom'])
+    bmesh.ops.translate(bm, verts=c4['verts'], vec=(0, 0, 0.2))
+    bmesh.ops.transform(bm,
+        verts=c4['verts'][9:],
+        matrix=Matrix.Shear('YZ', 4, (0.0, -1.0))
+    )
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
+
+    # mesh & object
+    mesh = D.meshes.new('limb_one_triangle')
+    object = D.objects.new(mesh.name, mesh)
+    C.scene.collection.objects.link(object)
+
+    # vertex groups
+    # ref: https://docs.blender.org/api/current/bmesh.html#customdata-access
+    deform_layer = bm.verts.layers.deform.new()
+    b1_vg = object.vertex_groups.new(name='limb.001')
+    for vert in bm.verts[0:32]:
+        vert[deform_layer][b1_vg.index] = 1.0
+    b2_vg = object.vertex_groups.new(name='limb.002')
+    for vert in bm.verts[16:24] + bm.verts[31:]:
         vert[deform_layer][b2_vg.index] = 1.0
     bm.to_mesh(mesh)
     bm.free()
@@ -115,6 +162,8 @@ if __name__ == '__main__':
     shared.delete_data()
     C.scene.frame_current = 1
     C.scene.frame_end = 100
-    limb1 = add_limb_naive()
+    limb1 = add_limb_one_loop()
     limb2 = add_limb_two_loops()
     limb2.location.x += 0.4
+    limb3 = add_limb_one_triangle()
+    limb3.location.x += 0.8
