@@ -54,14 +54,6 @@ def obj_join(sources, remove_src=False):
             bpy.data.meshes.remove(src.data) # removes both the mesh and object
     return sources[0]
 
-def bm_geom_split(geom):
-    return {
-        'geom': geom,
-        'verts': tuple(e for e in geom if isinstance(e, bmesh.types.BMVert)),
-        'edges': tuple(e for e in geom if isinstance(e, bmesh.types.BMEdge)),
-        'faces': tuple(e for e in geom if isinstance(e, bmesh.types.BMFace)),
-    }
-
 class Owl:
     @classmethod
     def new(cls):
@@ -319,13 +311,13 @@ class Owl:
         # tibia
         _c1 = bmesh.ops.create_circle(bm, radius=0.2, segments=8)
         c2 = bmesh.ops.extrude_edge_only(bm, edges=bm.edges)
-        c2 = bm_geom_split(c2['geom'])
+        c2 = shared.bm_geom_split(c2['geom'])
         bmesh.ops.translate(bm, verts=c2['verts'], vec=(-0.25, 0.25, -0.25))
         bmesh.ops.scale(bm, verts=c2['verts'], vec=(0.5, 0.5, 1.0))
 
         # tarsometatarsus
         c3 = bmesh.ops.extrude_edge_only(bm, edges=c2['edges'])
-        c3 = bm_geom_split(c3['geom'])
+        c3 = shared.bm_geom_split(c3['geom'])
         bmesh.ops.translate(bm, verts=c3['verts'], vec=(0.125, -0.125, -0.20))
         bmesh.ops.scale(bm, verts=c3['verts'], vec=(0.5, 0.5, 1.0))
 

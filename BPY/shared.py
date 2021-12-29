@@ -2,11 +2,13 @@ import bpy, bmesh, dataclasses
 from mathutils import Matrix, Vector
 
 def delete_data():
-    for data in (bpy.data.actions, bpy.data.cameras, bpy.data.lights,
-                 bpy.data.materials, bpy.data.meshes, bpy.data.objects,
-                 bpy.data.collections, bpy.data.images):
-        for item in data:
-            data.remove(item)
+    for prop_collection in (
+        bpy.data.actions, bpy.data.armatures, bpy.data.cameras,
+        bpy.data.lights, bpy.data.materials, bpy.data.meshes,
+        bpy.data.objects, bpy.data.collections, bpy.data.images
+    ):
+        for item in prop_collection:
+            prop_collection.remove(item)
 
 def setup_reference(blendpath, type='Collection', name='References'):
     bpy.ops.wm.append(filepath=f"{filepath}/{type}/{name}",
@@ -24,6 +26,14 @@ def new_obj(bmesh_op, name, *args, **kwargs):
     bm.to_mesh(mesh)
     bm.free()
     return bpy.data.objects.new(name, mesh)
+
+def bm_geom_split(geom):
+    return {
+        'geom': geom,
+        'verts': tuple(e for e in geom if isinstance(e, bmesh.types.BMVert)),
+        'edges': tuple(e for e in geom if isinstance(e, bmesh.types.BMEdge)),
+        'faces': tuple(e for e in geom if isinstance(e, bmesh.types.BMFace)),
+    }
 
 @dataclasses.dataclass
 class UVIsland:
