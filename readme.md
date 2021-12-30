@@ -24,4 +24,5 @@ The scripts must be executed from their respective directories, e.g. `cd BPY; ./
 
 ## [Scripts/](https://github.com/obsiwitch/graphics/tree/main/Scripts)
 
+[<img src="https://i.imgur.com/iobY0v5.png" width="400px"/>](https://github.com/obsiwitch/graphics/blob/main/Scripts/EyeTexture.py)
 [<img src="https://i.imgur.com/PKGhTKP.png" width="400px"/>](https://github.com/obsiwitch/graphics/blob/main/Scripts/DimetricGrid.py)
