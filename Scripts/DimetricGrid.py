@@ -97,7 +97,7 @@ class Grid:
         return f"g{self.width()}x{self.height()}_{self.tile}"
 
 def save(element):
-    filename = Path('out') / f"{element}.png"
+    filename = Path('out') / f"DimetricGrid_{element}.png"
     filename.parent.mkdir(exist_ok=True)
     element.image(fgcolor="#4B5263", bgcolor="#ABB2BF") \
            .save(filename)
