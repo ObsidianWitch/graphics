@@ -16,7 +16,7 @@ def eye_texture(size):
     draw0 = PIL.ImageDraw.Draw(image)
 
     # iris & pupil
-    ellipse_helper(draw0, size, scale=(1.0, 1.0), fill=(150, 14, 0))
+    ellipse_helper(draw0, size, scale=(0.99, 0.99), fill=(150, 14, 0))
     ellipse_helper(draw0, size, scale=(0.9, 0.94), fill=(255, 192, 43))
 
     ellipse_helper(draw0, size, scale=(0.7, 0.8), outline=(248, 169, 0), width=2)
@@ -28,8 +28,8 @@ def eye_texture(size):
     # shadow
     shadow = PIL.Image.new('RGBA', size)
     draw1 = PIL.ImageDraw.Draw(shadow)
-    ellipse_helper(draw1, size, scale=(1.0, 1.0), fill=(0, 0, 0, 40))
-    ellipse_helper(draw1, size, scale=(1.0, 1.0), translate=(0, size[1] // 3),
+    ellipse_helper(draw1, size, scale=(0.99, 0.99), fill=(0, 0, 0, 40))
+    ellipse_helper(draw1, size, scale=(0.99, 0.99), translate=(0, size[1] // 3),
                    fill=(0, 255, 0))
     shadow.putdata(tuple(
         (0, 0, 0, 0) if color == (0, 255, 0, 255) else color
