@@ -16,6 +16,7 @@ The scripts must be executed from their respective directories, e.g. `cd BPY; ./
 
 ## [PixelArt/](https://github.com/obsiwitch/graphics/tree/main/PixelArt)
 
+[<img src="PixelArt/02_eldritch_doll.png" height="225px" style="object-fit: cover;"/>](PixelArt/02_eldritch_doll.png)
 [<img src="https://raw.githubusercontent.com/obsiwitch/graphics/main/PixelArt/01_avatar.png" width="400px"/>](https://github.com/obsiwitch/graphics/blob/main/PixelArt/01_avatar.png)
 
 ## [SVG/](https://github.com/obsiwitch/graphics/tree/main/SVG)
