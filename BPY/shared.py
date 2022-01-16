@@ -27,13 +27,24 @@ def new_obj(bmesh_op, name, *args, **kwargs):
     bm.free()
     return bpy.data.objects.new(name, mesh)
 
+def bm_create_plane(bm, fill):
+    result = bmesh.ops.create_grid(bm, x_segments=0, y_segments=0, size=0.5)
+    if not fill:
+        bmesh.ops.delete(bm, geom=result['verts'][0].link_faces,
+                         context='FACES_ONLY')
+    return result
+
 def bm_geom_split(geom):
-    return {
+    result = {
         'geom': geom,
-        'verts': tuple(e for e in geom if isinstance(e, bmesh.types.BMVert)),
-        'edges': tuple(e for e in geom if isinstance(e, bmesh.types.BMEdge)),
-        'faces': tuple(e for e in geom if isinstance(e, bmesh.types.BMFace)),
+        'verts': list(e for e in geom if isinstance(e, bmesh.types.BMVert)),
+        'edges': list(e for e in geom if isinstance(e, bmesh.types.BMEdge)),
+        'faces': list(e for e in geom if isinstance(e, bmesh.types.BMFace)),
     }
+    result['v'] = result['verts']
+    result['e'] = result['edges']
+    result['f'] = result['faces']
+    return result
 
 @dataclasses.dataclass
 class UVIsland:

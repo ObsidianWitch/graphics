@@ -24,13 +24,6 @@ if '.' not in sys.path:
 import shared
 importlib.reload(shared)
 
-def create_plane(bm, fill):
-    result = bmesh.ops.create_grid(bm, x_segments=0, y_segments=0, size=0.5)
-    if not fill:
-        bmesh.ops.delete(bm, geom=result['verts'][0].link_faces,
-                         context='FACES_ONLY')
-    return result
-
 def bm_absorb_obj(bm, obj):
     bm.from_mesh(obj.data)
     for m in obj.data.materials:
@@ -189,7 +182,7 @@ class Character:
         # bmesh
         bm = bmesh.new()
         uv_layer = bm.loops.layers.uv.new()
-        l1 = create_plane(bm, fill=False)['verts']
+        l1 = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=l1, vec=(0.07, 0.06, 1.0))
         bmesh.ops.scale(bm, verts=l1[2:], vec=(0.0, 1.07, 1.0))
         bmesh.ops.translate(bm, verts=l1, vec=(0.0, 0.02, 1.35))
@@ -216,19 +209,19 @@ class Character:
         bm = bmesh.new()
         uv_layer = bm.loops.layers.uv.new()
 
-        luppertop = create_plane(bm, fill=True)['verts']
+        luppertop = shared.bm_create_plane(bm, fill=True)['verts']
         bmesh.ops.scale(bm, verts=luppertop, vec=(0.14, 0.1, 1.0))
         bmesh.ops.translate(bm, verts=luppertop, vec=(0.0, 0.015, 1.352))
 
-        luppermid = create_plane(bm, fill=False)['verts']
+        luppermid = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=luppermid, vec=(0.24, 0.18, 1.0))
         bmesh.ops.translate(bm, verts=luppermid, vec=(0.0, -0.017, 1.21))
 
-        lwaist = create_plane(bm, fill=False)['verts']
+        lwaist = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=lwaist, vec=(0.14, 0.11, 1.0))
         bmesh.ops.translate(bm, verts=lwaist, vec=(0.0, -0.02, 1.076))
 
-        lbot = create_plane(bm, fill=False)['verts']
+        lbot = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=lbot, vec=(0.23, 0.16, 1.0))
         bmesh.ops.translate(bm, verts=lbot, vec=(0.0, -0.004, 0.999))
 
@@ -291,29 +284,29 @@ class Character:
         bm = bmesh.new()
         uv_layer = bm.loops.layers.uv.new()
 
-        l1 = create_plane(bm, fill=True)['verts']
+        l1 = shared.bm_create_plane(bm, fill=True)['verts']
         bmesh.ops.scale(bm, verts=l1, vec=(0.11, 0.07, 1.0))
         bmesh.ops.rotate(bm, verts=l1, cent=l1[0].co,
                          matrix=Rotation(radians(10), 4, 'Y'))
         bmesh.ops.translate(bm, verts=l1, vec=(0.12627, 0.019375, 1.3378))
 
-        l4 = create_plane(bm, fill=False)['verts']
+        l4 = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=l4, vec=(0.06, 0.06, 1.0))
         bmesh.ops.rotate(bm, verts=l4, matrix=Rotation(radians(-10), 4, 'Y'))
         bmesh.ops.translate(bm, verts=l4, vec=(0.19385, 0.02, 1.0928))
 
-        l5 = create_plane(bm, fill=False)['verts']
+        l5 = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=l5, vec=(0.08, 0.06, 1.0))
         bmesh.ops.rotate(bm, verts=l5, matrix=Rotation(radians(-12), 4, 'Y'))
         bmesh.ops.translate(bm, verts=l5, vec=(0.23261, 0.02, 0.94141))
 
-        l6 = create_plane(bm, fill=False)['verts']
+        l6 = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=l6, vec=(0.12, 0.15, 1.0))
         bmesh.ops.translate(bm, verts=l6, vec=(0.24, 0.0, 0.81))
         bmesh.ops.translate(bm, verts=l6[1::1], vec=(0.0, 0.0, -0.01))
         bmesh.ops.translate(bm, verts=l6[2:3], vec=(0.03, 0.0, 0.0))
 
-        l7 = create_plane(bm, fill=False)['verts']
+        l7 = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=l7, vec=(0.0, 0.12, 1.0))
         bmesh.ops.translate(bm, verts=l7, vec=(0.22202, 0.01375, 0.76588))
 
@@ -336,22 +329,22 @@ class Character:
         bm = bmesh.new()
         uv_layer = bm.loops.layers.uv.new()
 
-        ltop = create_plane(bm, fill=False)['verts']
+        ltop = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=ltop, vec=(0.16, 0.16, 1.0))
         bmesh.ops.scale(bm, verts=ltop[1::2], vec=(1.0, 1.15, 1.0))
         bmesh.ops.translate(bm, verts=ltop, vec=(0.08, 0.016, 0.83))
         bmesh.ops.translate(bm, verts=ltop[1::2], vec=(0.0, 0.0, 0.084))
 
-        lmid = create_plane(bm, fill=False)['verts']
+        lmid = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=lmid, vec=(0.1, 0.1, 1.0))
         bmesh.ops.translate(bm, verts=lmid, vec=(0.065, 0.025, 0.55))
 
-        lbot = create_plane(bm, fill=False)['verts']
+        lbot = shared.bm_create_plane(bm, fill=False)['verts']
         bmesh.ops.scale(bm, verts=lbot, vec=(0.1, 0.1, 1.0))
         bmesh.ops.translate(bm, verts=lbot, vec=(0.06566, 0.033125, 0.0))
         bmesh.ops.translate(bm, verts=lbot[0:2], vec=(0.0, 0.0, 0.15))
 
-        lfeet = create_plane(bm, fill=True)['verts']
+        lfeet = shared.bm_create_plane(bm, fill=True)['verts']
         bmesh.ops.scale(bm, verts=lfeet, vec=(0.1, 0.06, 1.0))
         bmesh.ops.translate(bm, verts=lfeet, vec=(0.06625, -0.178 + 0.03, 0.0))
         bmesh.ops.rotate(bm, verts=lfeet, cent=lfeet[0].co,
