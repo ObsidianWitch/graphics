@@ -1,11 +1,12 @@
 import bpy, bmesh, dataclasses
 from mathutils import Matrix, Vector
+C = bpy.context
+D = bpy.data
 
 def delete_data():
     for prop_collection in (
-        bpy.data.actions, bpy.data.armatures, bpy.data.cameras,
-        bpy.data.lights, bpy.data.materials, bpy.data.meshes,
-        bpy.data.objects, bpy.data.collections, bpy.data.images
+        D.actions, D.armatures, D.cameras, D.lights, D.materials, D.meshes,
+        D.objects, D.collections, D.images
     ):
         for item in prop_collection:
             prop_collection.remove(item)
@@ -14,7 +15,7 @@ def setup_reference(blendpath, type='Collection', name='References'):
     bpy.ops.wm.append(filepath=f"{filepath}/{type}/{name}",
                       directory=f"{filepath}/{type}",
                       filename=name)
-    for obj in bpy.data.collections['References'].objects:
+    for obj in D.collections['References'].objects:
         obj.hide_viewport = True
         obj.show_in_front = True
         obj.display_type = 'WIRE'
@@ -22,10 +23,16 @@ def setup_reference(blendpath, type='Collection', name='References'):
 def new_obj(bmesh_op, name, *args, **kwargs):
     bm = bmesh.new()
     bmesh_op(bm, *args, **kwargs)
-    mesh = bpy.data.meshes.new(name)
+    mesh = D.meshes.new(name)
     bm.to_mesh(mesh)
     bm.free()
-    return bpy.data.objects.new(name, mesh)
+    return D.objects.new(name, mesh)
+
+def bm_absorb_obj(bm, obj):
+    bm.from_mesh(obj.data)
+    for m in obj.data.materials:
+        D.materials.remove(m)
+    D.meshes.remove(obj.data) # removes both the mesh and object from D
 
 def bm_create_plane(bm, fill):
     result = bmesh.ops.create_grid(bm, x_segments=0, y_segments=0, size=0.5)

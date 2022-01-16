@@ -22,6 +22,19 @@ importlib.reload(shared)
 
 class Character:
     @classmethod
+    def object(cls):
+        # bmesh
+        bm = bmesh.new()
+        shared.bm_absorb_obj(bm, cls.torso())
+
+        # mesh & object
+        mesh = D.meshes.new('character')
+        bm.to_mesh(mesh)
+        bm.free()
+        object = D.objects.new(mesh.name, mesh)
+        return object
+
+    @classmethod
     def torso(cls) -> bpy.types.Object:
         bm = bmesh.new()
         uv_layer = bm.loops.layers.uv.new()
@@ -49,4 +62,4 @@ class Character:
 
 if __name__ == '__main__':
     shared.delete_data()
-    D.scenes[0].collection.objects.link(Character.torso())
+    D.scenes[0].collection.objects.link(Character.object())

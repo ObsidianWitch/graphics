@@ -24,25 +24,19 @@ if '.' not in sys.path:
 import shared
 importlib.reload(shared)
 
-def bm_absorb_obj(bm, obj):
-    bm.from_mesh(obj.data)
-    for m in obj.data.materials:
-        D.materials.remove(m)
-    D.meshes.remove(obj.data) # removes both the mesh and object from bpy.data
-
 class Character:
     @classmethod
     def object(cls):
         # mesh & object
         bm = bmesh.new()
         uv_layer = bm.loops.layers.uv.new()
-        bm_absorb_obj(bm, cls.head())
-        bm_absorb_obj(bm, cls.arm())
-        bm_absorb_obj(bm, cls.pelvis())
+        shared.bm_absorb_obj(bm, cls.head())
+        shared.bm_absorb_obj(bm, cls.arm())
+        shared.bm_absorb_obj(bm, cls.pelvis())
         bmesh.ops.mirror(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
                          merge_dist=0.001, axis='X', mirror_u=True)
-        bm_absorb_obj(bm, cls.nose())
-        bm_absorb_obj(bm, cls.neck())
+        shared.bm_absorb_obj(bm, cls.nose())
+        shared.bm_absorb_obj(bm, cls.neck())
 
         mesh = D.meshes.new('character')
         bm.to_mesh(mesh)
@@ -399,8 +393,8 @@ class Character:
         uv_layer = bm.loops.layers.uv.new()
 
         # create pelvis from torso and leg
-        bm_absorb_obj(bm, cls.torso())
-        bm_absorb_obj(bm, cls.leg())
+        shared.bm_absorb_obj(bm, cls.torso())
+        shared.bm_absorb_obj(bm, cls.leg())
         bmesh.ops.bridge_loops(bm, edges=bm.edges[6:8] + bm.edges[17:18]
                                + bm.edges[25:29])
         bmesh.ops.subdivide_edges(bm, edges=bm.edges[55:57], cuts=1)
