@@ -25,7 +25,7 @@ class Character:
     def object(cls):
         # bmesh
         bm = bmesh.new()
-        shared.bm_absorb_obj(bm, cls.torso())
+        shared.bm_absorb_obj(bm, cls.body())
 
         # mesh & object
         mesh = D.meshes.new('character')
@@ -35,10 +35,11 @@ class Character:
         return object
 
     @classmethod
-    def torso(cls) -> bpy.types.Object:
+    def body(cls):
+        # bmesh
         bm = bmesh.new()
-        uv_layer = bm.loops.layers.uv.new()
 
+        ## torso
         l1 = { 'v': shared.bm_create_plane(bm, fill=True)['verts'] }
         bmesh.ops.scale(bm, verts=l1['v'], vec=(1.2, 0.2, 1.0))
         bmesh.ops.translate(bm, verts=l1['v'], vec=(0.0, 0.0, 2.0))
@@ -47,10 +48,21 @@ class Character:
         bmesh.ops.scale(bm, verts=l2['v'], vec=(1.1, 0.6, 1.0))
         bmesh.ops.translate(bm, verts=l2['v'], vec=(0.0, 0.0, 1.2))
 
+        ## skirt
         l3 = { 'v': shared.bm_create_plane(bm, fill=False)['verts'] }
         bmesh.ops.scale(bm, verts=l3['v'], vec=(0.5, 0.4, 1.0))
         bmesh.ops.translate(bm, verts=l3['v'], vec=(0.0, -0.2, 0.0))
 
+        l4 = { 'v': shared.bm_create_plane(bm, fill=False)['verts'] }
+        bmesh.ops.scale(bm, verts=l4['v'], vec=(1.5, 1.0, 1.0))
+        bmesh.ops.translate(bm, verts=l4['v'], vec=(0.0, 0.0, -1.3))
+
+        l5 = { 'v': shared.bm_create_plane(bm, fill=False)['verts'] }
+        bmesh.ops.scale(bm, verts=l5['v'], vec=(0.8, 0.4, 1.0))
+        bmesh.ops.translate(bm, verts=l5['v'], vec=(0.0, 0.0, -3.0))
+        bmesh.ops.translate(bm, verts=l5['v'][1::2], vec=(0.0, 0.0, -0.5))
+
+        bmesh.ops.translate(bm, verts=bm.verts, vec=(0, 0, -l5['v'][-1].co.z))
         bmesh.ops.bridge_loops(bm, edges=bm.edges)
 
         # mesh & object
