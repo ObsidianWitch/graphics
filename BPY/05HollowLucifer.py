@@ -39,8 +39,17 @@ class Character:
         # bmesh
         bm = bmesh.new()
 
+        ## neck
+        la = { 'v': shared.bm_create_plane(bm, fill=False)['verts'] }
+        bmesh.ops.scale(bm, verts=la['v'], vec=(0.09, 0.09, 1.0))
+        bmesh.ops.translate(bm, verts=la['v'], vec=(0.0, 0.02, 2.2))
+
+        lb = { 'v': shared.bm_create_plane(bm, fill=False)['verts'] }
+        bmesh.ops.scale(bm, verts=lb['v'], vec=(0.08, 0.08, 1.0))
+        bmesh.ops.translate(bm, verts=lb['v'], vec=(0.0, 0.0, 2.02))
+
         ## torso
-        l1 = { 'v': shared.bm_create_plane(bm, fill=True)['verts'] }
+        l1 = { 'v': shared.bm_create_plane(bm, fill=False)['verts'] }
         bmesh.ops.scale(bm, verts=l1['v'], vec=(1.2, 0.2, 1.0))
         bmesh.ops.translate(bm, verts=l1['v'], vec=(0.0, 0.0, 2.0))
 
