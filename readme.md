@@ -16,6 +16,7 @@ The scripts must be executed from their respective directories, e.g. `cd BPY; ./
 
 ## [PixelArt/](PixelArt/)
 
+[<img src="PixelArt/05_sleepy_ina.png" height="225pxpx"/>](PixelArt/05_sleepy_ina.png)
 [<img src="PixelArt/04_mask.png"/>](PixelArt/04_mask.png)
 [<img src="PixelArt/03_golden_sun.png" height="225px"/>](PixelArt/03_golden_sun.png)
 [<img src="PixelArt/02_eldritch_doll.png" height="225px"/>](PixelArt/02_eldritch_doll.png)
