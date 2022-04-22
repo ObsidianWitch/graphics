@@ -33,6 +33,5 @@ Screenshot | Description
 
 ## [Scripts/](Scripts/)
 
-[<img src="https://i.imgur.com/XwnBLLq.png" height="225px"/>](Scripts/Pattern.py)
 [<img src="https://i.imgur.com/zm6RGrA.png" width="400px"/>](Scripts/EyeTexture.py)
 [<img src="https://i.imgur.com/PKGhTKP.png" width="400px"/>](Scripts/DimetricGrid.py)
