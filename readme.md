@@ -2,6 +2,11 @@
 
 The scripts must be executed from their respective directories, e.g. `cd BPY; ./01CubesGridWave.py`.
 
+## [Blender/](Blender/)
+Screenshot | Description
+ --- | ---
+[<img src="https://i.imgur.com/aZJWOGx.png" width="400px"/>](Blender/01HollowLucifer.blend) | **Helltaker Lucifer x Hollow Knight** · [Reference](https://www.pixiv.net/en/artworks/84569040)
+
 ## [BPY/](BPY/)
 
 [<img src="https://i.imgur.com/XDJTSwJ.jpg" width="400px"/>](BPY/04LimbTopology.py)
