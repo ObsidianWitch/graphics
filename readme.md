@@ -27,6 +27,7 @@ Screenshot | Description
 
 Illustration | Description
  --- | ---
+ [<img src="PixelArt/06_avatar.png" height="225pxpx"/>](PixelArt/06_avatar.png) | **Hollow Lucifer**
 [<img src="PixelArt/05_sleepy_ina.png" height="225pxpx"/>](PixelArt/05_sleepy_ina.png) | **Sleepy Ina'nis**
 [<img src="PixelArt/04_mask.png"/>](PixelArt/04_mask.png) | **Mask**
 [<img src="PixelArt/03_golden_sun.png" height="225px"/>](PixelArt/03_golden_sun.png) | **Mia x Jenna Golden Sun**
