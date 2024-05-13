@@ -32,7 +32,7 @@ Illustration | Description
 [<img src="PixelArt/04_mask.png"/>](PixelArt/04_mask.png) | **Mask**
 [<img src="PixelArt/03_golden_sun.png" height="225px"/>](PixelArt/03_golden_sun.png) | **Mia x Jenna Golden Sun**
 [<img src="PixelArt/02_eldritch_doll.png" height="225px"/>](PixelArt/02_eldritch_doll.png) | **Eldritch doll**
-[<img src="PixelArt/01_avatar.png" width="400px"/>](PixelArt/01_avatar.png) | **~Self-portait**
+[<img src="PixelArt/01_avatar.png" width="400px"/>](PixelArt/01_avatar.png) | **Avatar**
 
 ## [SVG/](SVG/)
 
@@ -44,5 +44,5 @@ Illustration | Description
 
 Output | Description
  --- | ---
-[<img src="https://i.imgur.com/zm6RGrA.png" width="400px"/>](Scripts/EyeTexture.py) | **Stylized eye texture**
+[<img src="https://i.imgur.com/yu2sbir.png" width="400px"/>](Scripts/EyeTexture.py) | **Stylized eye texture**
 [<img src="https://i.imgur.com/PKGhTKP.png" width="400px"/>](Scripts/DimetricGrid.py) | **Dimetric grid**

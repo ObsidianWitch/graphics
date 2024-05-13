@@ -20,8 +20,7 @@ def eye_texture(size):
     ellipse_helper(draw0, size, scale=(0.9, 0.94), fill=(255, 192, 43))
 
     ellipse_helper(draw0, size, scale=(0.7, 0.8), outline=(248, 169, 0), width=2)
-    ellipse_helper(draw0, size, scale=(0.52, 0.94), fill=(248, 169, 0))
-    ellipse_helper(draw0, size, scale=(0.9, 0.52), fill=(248, 169, 0))
+    ellipse_helper(draw0, size, scale=(0.8, 0.9), outline=(248, 169, 0), width=2)
 
     ellipse_helper(draw0, size, scale=(0.56, 0.66), fill=(143, 9, 0))
 
