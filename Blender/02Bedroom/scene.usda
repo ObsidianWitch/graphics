@@ -154,6 +154,25 @@ def Xform "root" (
             }
         }
 
+        def Material "LightBlue"
+        {
+            token outputs:surface.connect = </root/_materials/LightBlue/Principled_BSDF.outputs:surface>
+
+            def Shader "Principled_BSDF"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                float inputs:clearcoat = 0
+                float inputs:clearcoatRoughness = 0.03
+                color3f inputs:diffuseColor = (0.38238946, 0.68371326, 0.9559737)
+                float inputs:ior = 1.5
+                float inputs:metallic = 0
+                float inputs:opacity = 1
+                float inputs:roughness = 0.5
+                float inputs:specular = 0.5
+                token outputs:surface
+            }
+        }
+
         def Material "Black"
         {
             token outputs:surface.connect = </root/_materials/Black/Principled_BSDF.outputs:surface>
@@ -163,7 +182,7 @@ def Xform "root" (
                 uniform token info:id = "UsdPreviewSurface"
                 float inputs:clearcoat = 0
                 float inputs:clearcoatRoughness = 0.03
-                color3f inputs:diffuseColor = (0.02, 0.02, 0.02)
+                color3f inputs:diffuseColor = (0.1, 0.1, 0.1)
                 float inputs:ior = 1.5
                 float inputs:metallic = 0
                 float inputs:opacity = 1
@@ -538,14 +557,14 @@ def Xform "root" (
                 rel material:binding = </root/_materials/WoodFurniture>
             }
 
-            def GeomSubset "Grey" (
+            def GeomSubset "LightBlue" (
                 prepend apiSchemas = ["MaterialBindingAPI"]
             )
             {
                 uniform token elementType = "face"
                 uniform token familyName = "materialBind"
                 int[] indices = [0, 1, 2, 3, 4, 5]
-                rel material:binding = </root/_materials/Grey>
+                rel material:binding = </root/_materials/LightBlue>
             }
         }
     }
@@ -768,6 +787,52 @@ def Xform "root" (
                 interpolation = "uniform"
             )
             uniform token subdivisionScheme = "none"
+        }
+    }
+
+    def Xform "Smartphone"
+    {
+        matrix4d xformOp:transform = ( (7.549790126404332e-8, 1, 0, 0), (-1, 7.549790126404332e-8, 0, 0), (0, 0, 1, 0), (0.44999998807907104, 1.149999976158142, 0.5, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+        def Mesh "Smartphone" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            uniform bool doubleSided = 1
+            float3[] extent = [(0, 0, 0), (0.06999999, 0.15999997, 0.0050000027)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 1, 3, 2, 2, 3, 7, 6, 6, 7, 5, 4, 4, 5, 1, 0, 2, 6, 4, 0, 7, 3, 1, 5]
+            rel material:binding = </root/_materials/Black>
+            normal3f[] normals = [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, 0, -0.99999994), (0, 0, -0.99999994), (0, 0, -0.99999994), (0, 0, -0.99999994), (0, 0, 0.99999994), (0, 0, 0.99999994), (0, 0, 0.99999994), (0, 0, 0.99999994)] (
+                interpolation = "faceVarying"
+            )
+            point3f[] points = [(0, 0, 0), (0, 0, 0.0050000027), (0, 0.15999997, 0), (0, 0.15999997, 0.0050000027), (0.06999999, 0, 0), (0.06999999, 0, 0.0050000027), (0.06999999, 0.15999997, 0), (0.06999999, 0.15999997, 0.0050000027)]
+            bool[] primvars:sharp_face = [1, 1, 1, 1, 1, 1] (
+                interpolation = "uniform"
+            )
+            uniform token subdivisionScheme = "none"
+            uniform token subsetFamily:materialBind:familyType = "nonOverlapping"
+
+            def GeomSubset "Black" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                uniform token elementType = "face"
+                uniform token familyName = "materialBind"
+                int[] indices = [4, 5]
+                rel material:binding = </root/_materials/Black>
+            }
+
+            def GeomSubset "Grey" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                uniform token elementType = "face"
+                uniform token familyName = "materialBind"
+                int[] indices = [0, 1, 2, 3]
+                rel material:binding = </root/_materials/Grey>
+            }
         }
     }
 }
