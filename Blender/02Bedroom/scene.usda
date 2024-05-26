@@ -835,5 +835,30 @@ def Xform "root" (
             }
         }
     }
+
+    def Xform "BedsideLamp"
+    {
+        matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0.04999999701976776, 1.4499999284744263, 0.5, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+        def Mesh "BedsideLamp" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            uniform bool doubleSided = 1
+            float3[] extent = [(0, 0, 0), (0.100000024, 0.100000024, 0.25)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 1, 3, 2, 2, 3, 7, 6, 6, 7, 5, 4, 4, 5, 1, 0, 2, 6, 4, 0, 7, 3, 1, 5]
+            rel material:binding = </root/_materials/White>
+            normal3f[] normals = [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1)] (
+                interpolation = "faceVarying"
+            )
+            point3f[] points = [(0, 0, 0), (0, 0, 0.25), (0, 0.100000024, 0), (0, 0.100000024, 0.25), (0.100000024, 0, 0), (0.100000024, 0, 0.25), (0.100000024, 0.100000024, 0), (0.100000024, 0.100000024, 0.25)]
+            bool[] primvars:sharp_face = [1, 1, 1, 1, 1, 1] (
+                interpolation = "uniform"
+            )
+            uniform token subdivisionScheme = "none"
+        }
+    }
 }
 
