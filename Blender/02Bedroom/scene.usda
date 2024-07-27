@@ -1100,5 +1100,33 @@ def Xform "root" (
             uniform token subdivisionScheme = "none"
         }
     }
+
+    def Xform "Notebook"
+    {
+        matrix4d xformOp:transform = ( (-1, -1.5099580252808664e-7, 0, 0), (1.5099580252808664e-7, -1, 0, 0), (0, 0, 1, 0), (1.0700000524520874, 2.200000047683716, 0.800000011920929, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+        def Mesh "Notebook" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            uniform bool doubleSided = 1
+            float3[] extent = [(0, 0, 0), (0.2, 0.15, 0.030000001)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 2, 3, 1, 4, 5, 7, 6, 1, 3, 7, 5, 0, 1, 5, 4, 2, 0, 4, 6, 3, 2, 6, 7]
+            rel material:binding = </root/_materials/ColorAttribute>
+            normal3f[] normals = [(0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0)] (
+                interpolation = "faceVarying"
+            )
+            point3f[] points = [(0, 0, 0), (0.2, 0, 0), (0, 0.15, 0), (0.2, 0.15, 0), (0, 0, 0.030000001), (0.2, 0, 0.030000001), (0, 0.15, 0.030000001), (0.2, 0.15, 0.030000001)]
+            color3f[] primvars:Colors = [(1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1)] (
+                interpolation = "faceVarying"
+            )
+            bool[] primvars:sharp_face = [1, 1, 1, 1, 1, 1] (
+                interpolation = "uniform"
+            )
+            uniform token subdivisionScheme = "none"
+        }
+    }
 }
 
