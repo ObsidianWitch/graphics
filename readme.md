@@ -6,6 +6,7 @@ The scripts must be executed from their respective directories, e.g. `cd BPY; ./
 Screenshot | Description
  --- | ---
 [<img src="https://i.imgur.com/ghZ95sG.png" width="400px"/>](Blender/01HollowLucifer/main.blend) | **Helltaker Lucifer x Hollow Knight** · [Reference](https://www.pixiv.net/en/artworks/84569040)
+[<img src="https://i.imgur.com/nTe8Rvv.png" width="400px"/>](Blender/02Bedroom/scene.blend) | **Bedroom**
 
 ## [BPY/](BPY/)
 
