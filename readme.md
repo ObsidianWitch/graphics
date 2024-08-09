@@ -5,24 +5,24 @@ The scripts must be executed from their respective directories, e.g. `cd BPY; ./
 ## [Blender/](Blender/)
 Screenshot | Description
  --- | ---
-[<img src="https://i.imgur.com/ghZ95sG.png" width="400px"/>](Blender/01HollowLucifer/main.blend) | **Helltaker Lucifer x Hollow Knight** · [Reference](https://www.pixiv.net/en/artworks/84569040)
-[<img src="https://i.imgur.com/nTe8Rvv.png" width="400px"/>](Blender/02Bedroom/scene.blend) | **Bedroom**
+[<img src="https://i.imgur.com/ghZ95sG.png" width="400px"/>](https://i.imgur.com/ghZ95sG.png) | [**Helltaker Lucifer x Hollow Knight**](Blender/01HollowLucifer/main.blend) · [Reference](https://www.pixiv.net/en/artworks/84569040)
+[<img src="https://i.imgur.com/nTe8Rvv.png" width="400px"/>](https://i.imgur.com/nTe8Rvv.png) | [**Bedroom**](Blender/02Bedroom/scene.blend)
 
 ## [BPY/](BPY/)
 
 Screenshot | Description
  --- | ---
-[<img src="https://i.imgur.com/XDJTSwJ.jpg" width="400px"/>](BPY/04LimbTopology.py) | **Limb topology** · [Reference](http://wiki.polycount.com/wiki/Limb_Topology)
-[<img src="https://i.imgur.com/INZLLlV.jpg" width="400px"/>](BPY/03NewsCaster.py) | **Newscaster** · [Reference](https://www.models-resource.com/playstation/megamanlegends/model/34942/)
-[<img src="https://i.imgur.com/LJJQbB7.jpg" width="400px"/>](BPY/02CubeOwl.py) | **Cube Owl** · [Reference](https://studio.blender.org/training/primitive-animals/)
-[<img src="https://i.imgur.com/5ku3mve.jpg" width="400px"/>](BPY/01CubesGridWave.py) | **Animated grid of cubes** · [Reference](https://www.youtube.com/watch?v=QnvN1dieIAU)
+[<img src="https://i.imgur.com/XDJTSwJ.jpg" width="400px"/>](https://i.imgur.com/XDJTSwJ.jpg) | [**Limb topology**](BPY/04LimbTopology.py) · [Reference](http://wiki.polycount.com/wiki/Limb_Topology)
+[<img src="https://i.imgur.com/INZLLlV.jpg" width="400px"/>](https://i.imgur.com/INZLLlV.jpg) | [**Newscaster**](BPY/03NewsCaster.py) · [Reference](https://www.models-resource.com/playstation/megamanlegends/model/34942/)
+[<img src="https://i.imgur.com/LJJQbB7.jpg" width="400px"/>](https://i.imgur.com/LJJQbB7.jpg) | [**Cube Owl**](BPY/02CubeOwl.py) · [Reference](https://studio.blender.org/training/primitive-animals/)
+[<img src="https://i.imgur.com/5ku3mve.jpg" width="400px"/>](https://i.imgur.com/5ku3mve.jpg) | [**Animated grid of cubes**](BPY/01CubesGridWave.py) · [Reference](https://www.youtube.com/watch?v=QnvN1dieIAU)
 
 ## [OpenSCAD/](OpenSCAD/)
 
 Screenshot | Description
  --- | ---
-[<img src="https://i.imgur.com/05HGK2t.png" width="400px"/>](OpenSCAD/tools/nightlight.scad) | **Night light enclosure**
-[<img src="https://i.imgur.com/CbRCj6e.png" width="400px"/>](OpenSCAD/tools/beam.scad) | **Technic beam**
+[<img src="https://i.imgur.com/05HGK2t.png" width="400px"/>](https://i.imgur.com/05HGK2t.png) | [**Night light enclosure**](OpenSCAD/tools/nightlight.scad)
+[<img src="https://i.imgur.com/CbRCj6e.png" width="400px"/>](https://i.imgur.com/CbRCj6e.png) | [**Technic beam**](OpenSCAD/tools/beam.scad)
 
 ## [PixelArt/](PixelArt/)
 
@@ -45,5 +45,5 @@ Illustration | Description
 
 Output | Description
  --- | ---
-[<img src="https://i.imgur.com/yu2sbir.png" width="400px"/>](Scripts/EyeTexture.py) | **Stylized eye texture**
-[<img src="https://i.imgur.com/PKGhTKP.png" width="400px"/>](Scripts/DimetricGrid.py) | **Dimetric grid**
+[<img src="https://i.imgur.com/yu2sbir.png" width="400px"/>](https://i.imgur.com/yu2sbir.png) | [**Stylized eye texture**](Scripts/EyeTexture.py)
+[<img src="https://i.imgur.com/PKGhTKP.png" width="400px"/>](https://i.imgur.com/PKGhTKP.png) | [**Dimetric grid**](Scripts/DimetricGrid.py)
