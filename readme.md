@@ -7,6 +7,7 @@ Screenshot | Description
  --- | ---
 [<img src="https://i.imgur.com/ghZ95sG.png" width="400px"/>](https://i.imgur.com/ghZ95sG.png) | [**Helltaker Lucifer x Hollow Knight**](Blender/01HollowLucifer/main.blend) · [Reference](https://www.pixiv.net/en/artworks/84569040)
 [<img src="https://i.imgur.com/nTe8Rvv.png" width="400px"/>](https://i.imgur.com/nTe8Rvv.png) | [**Bedroom**](Blender/02Bedroom/scene.blend)
+[<img src="https://i.imgur.com/XAnGNR4.png" width="400px"/>](https://i.imgur.com/ySgLO8v.mp4) | [**Xal'atath (WoW) & Ina'nis (Hololive) crossover**](Blender/03XalIna/scene.blend)
 
 ## [BPY/](BPY/)
 
