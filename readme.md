@@ -24,6 +24,7 @@ Screenshot | Description
  --- | ---
 [<img src="https://i.imgur.com/05HGK2t.png" width="400px"/>](https://i.imgur.com/05HGK2t.png) | [**Night light enclosure**](OpenSCAD/tools/nightlight.scad)
 [<img src="https://i.imgur.com/CbRCj6e.png" width="400px"/>](https://i.imgur.com/CbRCj6e.png) | [**Technic beam**](OpenSCAD/tools/beam.scad)
+[<img src="https://i.imgur.com/OpsEvzo.png" width="400px"/>](https://i.imgur.com/OpsEvzo.png) | [**Hexagon bangles**](OpenSCAD/trinkets/hexbangles.scad)
 
 ## [PixelArt/](PixelArt/)
 
