@@ -35,11 +35,11 @@ module bangle_stripe0(pipe_r, pipe_b, stripe_l, stripe_n) {
 // * pipe_b: pipe border
 // * hex_n & hex_m: horizontal & vertical number of elements of the hexagonal grid
 // * hex_r: hexagon tile radius
-// * hex_offset: offset between hexagon tiles
-module pipe_pattern_hex(pipe_r, pipe_b, hex_n, hex_m, hex_r, hex_offset=0) {
+// * hex_zoffset: z offset between hexagon tiles
+module pipe_pattern_hex(pipe_r, pipe_b, hex_n, hex_m, hex_r, hex_zoffset=0) {
     a = 360/hex_n; // angle offset between each hexagon tile
     for(j=[0 : hex_m - 1]) {
-        z = j*sqrt(3)*(hex_r + hex_offset)/2;
+        z = j*sqrt(3)*(hex_r + hex_zoffset)/2;
         for(i=[0 : hex_n - 1]) {
             sum_a = (j % 2 == 0) ? a*i : a*i + a/2;
             rotz(sum_a) tra([0, pipe_r, z]) rotx(-90) {
@@ -59,23 +59,23 @@ module bangle_hex0(pipe_r=35, pipe_b=2, hex_r=4, hex_n=20, hex_m=5) {
     }
 }
 
-module bangle_hex1(pipe_r=35, pipe_b=2, hex_r=4, hex_b=1, hex_n=20, hex_m=5) {
+module bangle_hex1(pipe_r=35, pipe_b=2, hex_r=4, hex_b=1, hex_n=22, hex_m=5) {
     difference() {
-        pipe_pattern_hex(pipe_r, pipe_b, hex_n, hex_m, hex_r);
+        pipe_pattern_hex(pipe_r, pipe_b, hex_n, hex_m, hex_r, hex_zoffset=-hex_b/2);
         pipe_pattern_hex(
             pipe_r=pipe_r - 0.5, pipe_b=pipe_b + 1,
-            hex_n=hex_n, hex_m=hex_m, hex_r=hex_r - hex_b, hex_offset=hex_b
+            hex_n=hex_n, hex_m=hex_m, hex_r=hex_r - hex_b, hex_zoffset=hex_b/2
         );
     }
 }
 
 module bangle_hex2(
     pipe_r=35, pipe_b=2,
-    hex_r=4, hex_b=1, hex_n=20, hex_m=3,
+    hex_r=4, hex_b=1, hex_n=22, hex_m=3,
     stripe_l=4, stripe_n=70,
     $fn=128,
 ) {
-    traz(hex_m*sqrt(3)*hex_r/2 + hex_b/2 + stripe_l/2 + 0.5)
+    traz(hex_m*sqrt(3)*hex_r/2 - hex_b/2 + stripe_l/2 + 0.5)
         bangle_stripe0(pipe_r, pipe_b, stripe_l, stripe_n);
 
     bangle_hex1(pipe_r, pipe_b, hex_r, hex_b, hex_n, hex_m);
@@ -86,10 +86,10 @@ module bangle_hex2(
 
 module bangle_hex3(
     pipe_r=35, pipe_b=2,
-    hex_r=4, hex_b=1, hex_n=20, hex_m=3,
+    hex_r=4, hex_b=1, hex_n=22, hex_m=3,
     $fn=128
 ) {
-    traz(hex_m*sqrt(3)*hex_r/2 + hex_b/2)
+    traz(hex_m*sqrt(3)*hex_r/2 - hex_b/2)
         pipe(hex_b, pipe_r, pipe_b);
 
     bangle_hex1(pipe_r, pipe_b, hex_r, hex_b, hex_n, hex_m);
